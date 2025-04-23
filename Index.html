@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Комнаты и Эталоны</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f4f8;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+        }
+        button {
+            padding: 10px 15px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            background-color: #3498db;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+        }
+        .etalon {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .warning {
+            background-color: #f39c12; /* Оранжевый */
+        }
+        .expired {
+            background-color: #e74c3c; /* Красный */
+            color: white;
+        }
+        .etalon-info {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+        textarea {
+            width: 100%;
+            height: 60px;
+            margin-top: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            padding: 8px;
+        }
+        input[type="text"], input[type="date"], input[type="number"], select {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Управление Эталонами</h1>
+        <button onclick="openRoomModal()">Создать комнату</button>
+        <div id="rooms"></div>
+    </div>
+
+    <div class="modal" id="roomModal">
+        <div class="modal-content">
+            <h2>Создать комнату</h2>
+            <input type="text" id="roomNumber" placeholder="Номер комнаты">
+            <button onclick="addRoom()">Добавить</button>
+            <button onclick="closeModal('roomModal')">Закрыть</button>
+        </div>
+    </div>
+
+    <div class="modal" id="etalonModal">
+        <div class="modal-content">
+            <h2>Добавить эталон</h2>
+            <input type="text" id="etalonName" placeholder="Наименование">
+            <input type="text" id="etalonNumber" placeholder="Номер эталона">
+            <select id="calibrationType">
+                <option value="Поверка">Поверка</option>
+                <option value="Калибровка">Калибровка</option>
+            </select>
+            <input type="date" id="calibrationDate">
+            <input type="number" id="interval" placeholder="Межповерочный интервал (дни)">
+            <label>
+                <input type="checkbox" id="extraInfoCheckbox"> Указать дополнительную информацию
+            </label>
+            <div id="extraInfoSection" style="display:none;">
+                <textarea id="extraInfo" placeholder="Введите дополнительную информацию"></textarea>
+            </div>
+            <button onclick="addEtalon()">Добавить</button>
+            <button onclick="closeModal('etalonModal')">Закрыть</button>
+        </div>
+    </div>
+
+    <script>
+        let rooms = {};
+
+        function openRoomModal() {
+            document.getElementById('roomModal').style.display = 'flex';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function addRoom() {
+            const roomNumber = document.getElementById('roomNumber').value;
+            if (roomNumber) {
+                rooms[roomNumber] = [];
+                document.getElementById('roomNumber').value = '';
+                renderRooms();
+                closeModal('roomModal');
+            }
+        }
+
+        function renderRooms() {
+            const roomsDiv = document.getElementById('rooms');
+            roomsDiv.innerHTML = '';
+            for (const room in rooms) {
+                const roomDiv = document.createElement('div');
+                roomDiv.className = 'etalon';
+                roomDiv.innerHTML = `<strong>Комната ${room}</strong>
+                                    <button onclick="openEtalonModal('${room}')">Добавить эталон</button>
+                                    <div id="${room}-etalon"></div>`;
+                roomsDiv.appendChild(roomDiv);
+            }
+        }
+
+        function openEtalonModal(room) {
+            document.getElementById('etalonModal').style.display = 'flex';
+            document.getElementById('currentRoom').value = room;
+            document.getElementById('extraInfoCheckbox').checked = false;
+            document.getElementById('extraInfoSection').style.display = 'none';
+            document.getElementById('extraInfo').value = '';
+        }
+
+        document.getElementById('extraInfoCheckbox').addEventListener('change', function() {
+            document.getElementById('extraInfoSection').style.display = this.checked ? 'block' : 'none';
+        });
+
+        function addEtalon() {
+            const room = document.getElementById('currentRoom').value;
+            const etalonName = document.getElementById('etalonName').value;
+            const etalonNumber = document.getElementById('etalonNumber').value;
+            const calibrationType = document.getElementById('calibrationType').value;
+            const calibrationDate = new Date(document.getElementById('calibrationDate').value);
+            const interval = parseInt(document.getElementById('interval').value);
+            const expiryDate = new Date(calibrationDate);
+            expiryDate.setDate(expiryDate.getDate() + interval);
+            const extraInfo = document.getElementById('extraInfoCheckbox').checked ? document.getElementById('extraInfo').value : '';
+
+            if (etalonName && etalonNumber) {
+                rooms[room].push({ etalonName, etalonNumber, calibrationType, calibrationDate, expiryDate, extraInfo });
+                document.getElementById('etalonName').value = '';
+                document.getElementById('etalonNumber').value = '';
+                document.getElementById('calibrationDate').value = '';
+                document.getElementById('interval').value = '';
+                renderEtalons(room);
+                closeModal('etalonModal');
+            }
+        }
+
+        function renderEtalons(room) {
+            const etalonDiv = document.getElementById(`${room}-etalon`);
+            etalonDiv.innerHTML = '';
+            rooms[room].forEach((etalon, index) => {
+                const daysLeft = Math.ceil((etalon.expiryDate - new Date()) / (1000 * 60 * 60 * 24));
+                const etalonElement = document.createElement('div');
+                
+                // Определение класса для цветового выделения
+                let className = '';
+                const today = new Date();
+                const oneMonthFromNow = new Date();
+                oneMonthFromNow.setMonth(today.getMonth() + 1);
+
+                if (etalon.expiryDate < today) {
+                    className = 'expired';
+                } else if (etalon.expiryDate <= oneMonthFromNow) {
+                    className = 'warning';
+                }
+
+                etalonElement.className = `etalon ${className}`;
+                etalonElement.innerHTML = `<div class="etalon-info">${etalon.etalonName} (${etalon.etalonNumber}) - Осталось: ${daysLeft} дней, Дата: ${etalon.expiryDate.toLocaleDateString()}</div>
+                                          <button onclick="showExtraInfo('${room}', ${index})">Доп. Инф.</button>
+                                          <button onclick="confirmDelete('${room}', ${index})">Удалить</button>`;
+                etalonDiv.appendChild(etalonElement);
+            });
+        }
+
+        function showExtraInfo(room, index) {
+            const etalon = rooms[room][index];
+            alert(etalon.extraInfo ? etalon.extraInfo : 'Дополнительная информация отсутствует.');
+        }
+
+        function confirmDelete(room, index) {
+            if (confirm("Вы уверены, что хотите удалить эталон?")) {
+                rooms[room].splice(index, 1);
+                renderEtalons(room);
+            }
+        }
+    </script>
+</body>
+</html>
