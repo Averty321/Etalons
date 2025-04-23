@@ -6,36 +6,18 @@
     <title>Комнаты и Эталоны</title>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f0f4f8;
-            color: #333;
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+            box-sizing: border-box;
         }
         .container {
             max-width: 600px;
             margin: auto;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        h1 {
-            text-align: center;
-            color: #2c3e50;
         }
         button {
-            padding: 10px 15px;
+            padding: 10px;
             margin: 5px;
-            border: none;
-            border-radius: 5px;
-            background-color: #3498db;
-            color: white;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        button:hover {
-            background-color: #2980b9;
         }
         .modal {
             display: none;
@@ -51,45 +33,20 @@
         .modal-content {
             background: white;
             padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
         }
         .etalon {
             margin: 10px 0;
             padding: 10px;
+            border: 1px solid #ccc;
             border-radius: 5px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
         }
         .warning {
-            background-color: #f39c12; /* Оранжевый */
+            background-color: orange;
         }
         .expired {
-            background-color: #e74c3c; /* Красный */
+            background-color: red;
             color: white;
-        }
-        .etalon-info {
-            flex-grow: 1;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            margin-right: 10px;
-        }
-        textarea {
-            width: 100%;
-            height: 60px;
-            margin-top: 10px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            padding: 8px;
-        }
-        input[type="text"], input[type="date"], input[type="number"], select {
-            width: calc(100% - 20px);
-            padding: 10px;
-            margin-top: 10px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
         }
     </style>
 </head>
@@ -218,8 +175,8 @@
                     className = 'warning';
                 }
 
-                etalonElement.className = `etalon ${className}`;
-                etalonElement.innerHTML = `<div class="etalon-info">${etalon.etalonName} (${etalon.etalonNumber}) - Осталось: ${daysLeft} дней, Дата: ${etalon.expiryDate.toLocaleDateString()}</div>
+                etalonElement.className = className;
+                etalonElement.innerHTML = `${etalon.etalonName} (${etalon.etalonNumber}) - Осталось: ${daysLeft} дней, Дата: ${etalon.expiryDate.toLocaleDateString()}
                                           <button onclick="showExtraInfo('${room}', ${index})">Доп. Инф.</button>
                                           <button onclick="confirmDelete('${room}', ${index})">Удалить</button>`;
                 etalonDiv.appendChild(etalonElement);
