@@ -205,18 +205,14 @@
             const etalonDiv = document.getElementById(`${room}-etalon`);
             etalonDiv.innerHTML = '';
             rooms[room].forEach((etalon, index) => {
-                const daysLeft = Math.ceil((etalon.expiryDate - new Date()) / (1000 * 60 * 60 * 24));
                 const etalonRow = document.createElement('tr');
 
                 // Определение класса для цветового выделения
-                let className = '';
                 const today = new Date();
-                const oneMonthFromNow = new Date();
-                oneMonthFromNow.setMonth(today.getMonth() + 1);
-
+                let className = '';
                 if (etalon.expiryDate < today) {
                     className = 'expired';
-                } else if (etalon.expiryDate <= oneMonthFromNow) {
+                } else if (etalon.expiryDate <= new Date(today.getFullYear(), today.getMonth() + 1, 0)) {
                     className = 'warning';
                 }
 
