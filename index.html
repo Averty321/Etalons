@@ -69,6 +69,7 @@
                 <th>Номер</th>
                 <th>Дата</th>
                 <th>Тип</th>
+                <th>Комната</th>
                 <th>Осталось дней</th>
                 <th>Действия</th>
             </tr>
@@ -79,6 +80,8 @@
     <div class="overlay" id="overlay"></div>
     <div class="modal" id="addStandardModal">
         <h3>Добавить эталон</h3>
+        <label for="roomSelect">Комната:</label>
+        <select id="roomSelect" required></select>
         <label for="standardName">Наименование:</label>
         <input type="text" id="standardName" required>
         <label for="standardNumber">Номер:</label>
@@ -98,14 +101,31 @@
 
     <script>
         let standards = [];
-        let roomNumber = '';
+        let rooms = [];
 
         document.getElementById('createRoom').addEventListener('click', () => {
-            roomNumber = prompt('Введите номер комнаты (можно текст):');
-            alert(`Комната "${roomNumber}" создана!`);
+            const roomName = prompt('Введите название комнаты (можно текст):');
+            rooms.push(roomName);
+            alert(`Комната "${roomName}" создана!`);
+            updateRoomSelect();
         });
 
+        function updateRoomSelect() {
+            const roomSelect = document.getElementById('roomSelect');
+            roomSelect.innerHTML = '';
+            rooms.forEach((room, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = room;
+                roomSelect.appendChild(option);
+            });
+        }
+
         document.getElementById('openAddStandard').addEventListener('click', () => {
+            if (rooms.length === 0) {
+                alert('Сначала создайте комнату!');
+                return;
+            }
             document.getElementById('overlay').style.display = 'block';
             document.getElementById('addStandardModal').style.display = 'block';
         });
@@ -116,11 +136,7 @@
         });
 
         document.getElementById('addStandard').addEventListener('click', () => {
-            if (!roomNumber) {
-                alert('Сначала создайте комнату!');
-                return;
-            }
-
+            const roomIndex = document.getElementById('roomSelect').value;
             const name = document.getElementById('standardName').value;
             const number = document.getElementById('standardNumber').value;
             const dateInput = new Date(document.getElementById('standardDate').value);
@@ -137,6 +153,7 @@
                 number,
                 date: dateInput,
                 type,
+                room: rooms[roomIndex],
                 expirationDate,
                 daysLeft,
                 additionalInfo: []
@@ -160,6 +177,7 @@
                     <td>${standard.number}</td>
                     <td>${standard.date.toLocaleDateString()}</td>
                     <td>${standard.type}</td>
+                    <td>${standard.room}</td>
                     <td>${standard.daysLeft}</td>
                     <td class="actions">
                         <button onclick="editStandard(${standards.indexOf(standard)})">Изменить</button>
