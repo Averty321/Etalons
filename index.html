@@ -51,6 +51,9 @@
             background: rgba(0, 0, 0, 0.5);
             z-index: 999;
         }
+        .expired {
+            background-color: #ffcccc; /* Красный цвет для просроченных эталонов */
+        }
     </style>
 </head>
 <body>
@@ -89,12 +92,19 @@
 
     <script>
         let standards = [];
+        let roomNumber = '';
 
         document.getElementById('createRoom').addEventListener('click', () => {
-            alert('Комната создана!');
+            roomNumber = prompt('Введите номер комнаты:');
+            alert(`Комната ${roomNumber} создана!`);
         });
 
         document.getElementById('addStandard').addEventListener('click', () => {
+            if (!roomNumber) {
+                alert('Сначала создайте комнату!');
+                return;
+            }
+
             const name = prompt('Введите наименование эталона:');
             const number = prompt('Введите номер эталона:');
             const dateInput = prompt('Введите дату (ГГГГ-ММ-ДД):');
@@ -145,6 +155,9 @@
             tbody.innerHTML = '';
             standards.forEach((standard, index) => {
                 const row = document.createElement('tr');
+                if (standard.daysLeft < 0) {
+                    row.classList.add('expired'); // Добавление класса для просроченного эталона
+                }
                 row.innerHTML = `
                     <td><button onclick="showAdditionalInfo(${index})">${standard.name}</button></td>
                     <td>${standard.number}</td>
