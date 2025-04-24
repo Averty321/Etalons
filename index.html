@@ -101,8 +101,8 @@
         let roomNumber = '';
 
         document.getElementById('createRoom').addEventListener('click', () => {
-            roomNumber = prompt('Введите номер комнаты:');
-            alert(`Комната ${roomNumber} создана!`);
+            roomNumber = prompt('Введите номер комнаты (можно текст):');
+            alert(`Комната "${roomNumber}" создана!`);
         });
 
         document.getElementById('openAddStandard').addEventListener('click', () => {
@@ -132,11 +132,6 @@
 
             const daysLeft = Math.ceil((expirationDate - new Date()) / (1000 * 60 * 60 * 24));
 
-            if (isNaN(daysLeft) || daysLeft < 0) {
-                alert('Ошибка: проверьте введенные данные.');
-                return;
-            }
-
             const standard = {
                 name,
                 number,
@@ -155,20 +150,20 @@
         function renderStandards() {
             const tbody = document.querySelector('#items tbody');
             tbody.innerHTML = '';
-            standards.forEach((standard, index) => {
+            standards.forEach((standard) => {
                 const row = document.createElement('tr');
                 if (standard.daysLeft < 0) {
                     row.classList.add('expired'); // Добавление класса для просроченного эталона
                 }
                 row.innerHTML = `
-                    <td><button onclick="showAdditionalInfo(${index})">${standard.name}</button></td>
+                    <td><button onclick="showAdditionalInfo(${standards.indexOf(standard)})">${standard.name}</button></td>
                     <td>${standard.number}</td>
                     <td>${standard.date.toLocaleDateString()}</td>
                     <td>${standard.type}</td>
                     <td>${standard.daysLeft}</td>
                     <td class="actions">
-                        <button onclick="editStandard(${index})">Изменить</button>
-                        <button onclick="deleteStandard(${index})">Удалить</button>
+                        <button onclick="editStandard(${standards.indexOf(standard)})">Изменить</button>
+                        <button onclick="deleteStandard(${standards.indexOf(standard)})">Удалить</button>
                     </td>
                 `;
                 tbody.appendChild(row);
