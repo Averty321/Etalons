@@ -16,14 +16,16 @@
             margin-top: 20px;
             width: 100%;
             border-collapse: collapse;
+            background-color: #f0f8ff; /* Цвет фона таблицы */
         }
         th, td {
-            border: 1px solid #ccc;
+            border: 1px solid #007bff; /* Цвет границы */
             padding: 10px;
             text-align: left;
         }
         th {
-            background-color: #f2f2f2;
+            background-color: #007bff; /* Синяя заливка заголовков */
+            color: white; /* Цвет текста заголовков */
         }
         .actions {
             display: flex;
@@ -82,13 +84,11 @@
         <h3>Добавить эталон</h3>
         <label for="roomSelect">Комната:</label>
         <select id="roomSelect" required></select>
-        <label for="standardName">Наименование:</label>
-        <input type="text" id="standardName" required>
         <label for="standardNumber">Номер:</label>
         <input type="text" id="standardNumber" required>
         <label for="standardDate">Дата:</label>
         <input type="date" id="standardDate" required>
-        <label for="interval">Межповерочный интервал (дни):</label>
+        <label for="interval">Межповерочный интервал (месяцы):</label>
         <input type="number" id="interval" required>
         <label for="type">Тип:</label>
         <select id="type">
@@ -137,19 +137,18 @@
 
         document.getElementById('addStandard').addEventListener('click', () => {
             const roomIndex = document.getElementById('roomSelect').value;
-            const name = document.getElementById('standardName').value;
             const number = document.getElementById('standardNumber').value;
             const dateInput = new Date(document.getElementById('standardDate').value);
             const interval = parseInt(document.getElementById('interval').value);
             const type = document.getElementById('type').value;
 
             const expirationDate = new Date(dateInput);
-            expirationDate.setDate(expirationDate.getDate() + interval);
+            expirationDate.setMonth(expirationDate.getMonth() + interval); // Увеличение на месяцы
 
             const daysLeft = Math.ceil((expirationDate - new Date()) / (1000 * 60 * 60 * 24));
 
             const standard = {
-                name,
+                name: 'Эталон', // Убрано поле наименования
                 number,
                 date: dateInput,
                 type,
@@ -173,7 +172,7 @@
                     row.classList.add('expired'); // Добавление класса для просроченного эталона
                 }
                 row.innerHTML = `
-                    <td><button onclick="showAdditionalInfo(${standards.indexOf(standard)})">${standard.name}</button></td>
+                    <td>${standard.name}</td>
                     <td>${standard.number}</td>
                     <td>${standard.date.toLocaleDateString()}</td>
                     <td>${standard.type}</td>
@@ -188,37 +187,18 @@
             });
         }
 
-        function showAdditionalInfo(index) {
-            const standard = standards[index];
-            const additionalInfoBody = document.getElementById('additionalInfoBody');
-            additionalInfoBody.innerHTML = '';
-
-            if (standard.additionalInfo) {
-                standard.additionalInfo.forEach(info => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `<td>${info.value}</td><td>${info.correction}</td>`;
-                    additionalInfoBody.appendChild(row);
-                });
-            }
-
-            document.getElementById('overlay').style.display = 'block';
-            document.getElementById('additionalInfo').style.display = 'block';
-        }
-
         window.editStandard = function(index) {
             const standard = standards[index];
-            const name = prompt('Введите новое наименование эталона:', standard.name);
             const number = prompt('Введите новый номер эталона:', standard.number);
             const dateInput = prompt('Введите новую дату (ГГГГ-ММ-ДД):', standard.date.toISOString().split('T')[0]);
             const date = new Date(dateInput);
-            const interval = parseInt(prompt('Введите новый межповерочный/калибровочный интервал в днях:', (standard.expirationDate - new Date(date)) / (1000 * 60 * 60 * 24)));
+            const interval = parseInt(prompt('Введите новый межповерочный интервал в месяцах:', (standard.expirationDate.getMonth() - standard.date.getMonth())));
             const type = prompt('Введите новый тип (поверка/калибровка):', standard.type);
 
             const expirationDate = new Date(date);
-            expirationDate.setDate(expirationDate.getDate() + interval);
+            expirationDate.setMonth(expirationDate.getMonth() + interval);
             const daysLeft = Math.ceil((expirationDate - new Date()) / (1000 * 60 * 60 * 24));
 
-            standard.name = name;
             standard.number = number;
             standard.date = date;
             standard.type = type;
