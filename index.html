@@ -3,195 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Управление Эталонами</title>
+    <title>Управление эталонами</title>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #2c3e50; /* Темно-синий фон */
-            color: white; /* Белый цвет текста */
-        }
-        .container {
-            max-width: 600px;
-            margin: auto;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            color: black; /* Черный цвет текста для контейнера */
-        }
-        h1 {
-            text-align: center;
-            color: #2c3e50; /* Цвет заголовка */
+            font-family: Arial, sans-serif;
+            margin: 20px;
         }
         button {
-            padding: 10px 15px;
-            margin: 5px;
-            border: none;
-            border-radius: 5px;
-            background-color: #3498db;
-            color: white;
-            cursor: pointer;
-            transition: background-color 0.3s;
+            margin-right: 10px;
         }
-        button:hover {
-            background-color: #2980b9;
-        }
-        button:disabled {
-            background-color: #ccc; /* Серый цвет для неактивной кнопки */
-            cursor: not-allowed;
-        }
-        .modal {
-            display: none;
-            position: fixed;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            justify-content: center;
-            align-items: center;
-        }
-        .modal-content {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-        }
-        input[type="text"], input[type="date"], input[type="number"], select {
-            width: calc(100% - 20px);
-            padding: 10px;
-            margin-top: 10px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-        }
-        .room {
+        #items {
             margin-top: 20px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+            list-style-type: none;
+            padding: 0;
         }
-        .etalon-info {
-            margin: 5px 0;
-            border-top: 1px solid #ccc;
-            padding-top: 5px;
+        .item {
+            margin-bottom: 10px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Управление Эталонами</h1>
-        <button onclick="openRoomModal()">Создать комнату</button>
-        <button id="addEtalonButton" onclick="openEtalonModal()" disabled>Добавить эталон</button>
-        <div id="rooms"></div>
-    </div>
 
-    <div class="modal" id="roomModal">
-        <div class="modal-content">
-            <h2>Создать комнату</h2>
-            <input type="text" id="roomNumber" placeholder="Номер комнаты">
-            <button onclick="addRoom()">Добавить</button>
-            <button onclick="closeModal('roomModal')">Закрыть</button>
-        </div>
-    </div>
+    <button id="createRoom">Создать комнату</button>
+    <button id="addStandard">Добавить эталон</button>
 
-    <div class="modal" id="etalonModal">
-        <div class="modal-content">
-            <h2>Добавить эталон</h2>
-            <select id="roomSelect"></select>
-            <input type="text" id="etalonName" placeholder="Наименование">
-            <input type="text" id="etalonNumber" placeholder="Номер эталона">
-            <select id="calibrationType">
-                <option value="Поверка">Поверка</option>
-                <option value="Калибровка">Калибровка</option>
-            </select>
-            <input type="date" id="calibrationDate">
-            <input type="number" id="interval" placeholder="Межповерочный интервал (дни)">
-            <button onclick="addEtalon()">Добавить</button>
-            <button onclick="closeModal('etalonModal')">Закрыть</button>
-        </div>
-    </div>
+    <ul id="items"></ul>
 
     <script>
-        let rooms = {};
+        let standards = [];
 
-        function openRoomModal() {
-            document.getElementById('roomModal').style.display = 'flex';
-        }
+        document.getElementById('createRoom').addEventListener('click', () => {
+            alert('Комната создана!');
+            // Логика создания комнаты
+        });
 
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-        }
+        document.getElementById('addStandard').addEventListener('click', () => {
+            const name = prompt('Введите наименование эталона:');
+            const number = prompt('Введите номер эталона:');
+            const type = prompt('Выберите тип (поверка/калибровка):');
+            const date = new Date(prompt('Введите дату поверки (ГГГГ-ММ-ДД):'));
+            const interval = parseInt(prompt('Введите межповерочный/калибровочный интервал в днях:'));
 
-        function addRoom() {
-            const roomNumber = document.getElementById('roomNumber').value;
-            if (roomNumber) {
-                rooms[roomNumber] = [];
-                document.getElementById('roomNumber').value = '';
-                renderRooms();
-                closeModal('roomModal');
-                document.getElementById('addEtalonButton').disabled = false; // Активируем кнопку добавления эталона
-            }
-        }
+            const expirationDate = new Date(date);
+            expirationDate.setDate(expirationDate.getDate() + interval);
 
-        function renderRooms() {
-            const roomsDiv = document.getElementById('rooms');
-            roomsDiv.innerHTML = '';
-            const roomSelect = document.getElementById('roomSelect');
-            roomSelect.innerHTML = ''; // Обновляем список выбора комнаты
+            const daysLeft = Math.ceil((expirationDate - new Date()) / (1000 * 60 * 60 * 24));
 
-            for (const room in rooms) {
-                const roomDiv = document.createElement('div');
-                roomDiv.className = 'room';
-                roomDiv.innerHTML = `<strong>Комната ${room}:</strong>`;
+            const standard = {
+                name,
+                number,
+                expirationDate,
+                daysLeft,
+                type
+            };
+
+            standards.push(standard);
+            renderStandards();
+        });
+
+        function renderStandards() {
+            const itemsList = document.getElementById('items');
+            itemsList.innerHTML = '';
+            standards.forEach((standard, index) => {
+                const listItem = document.createElement('li');
+                listItem.className = 'item';
+                listItem.textContent = `Комната 901 - Наименование: ${standard.name}, Номер: ${standard.number}, Дата поверки: ${standard.expirationDate.toLocaleDateString()}, Осталось дней: ${standard.daysLeft}`;
                 
-                // Добавляем информацию по эталонам в комнате
-                rooms[room].forEach(etalon => {
-                    roomDiv.innerHTML += `
-                        <div class="etalon-info">
-                            Наименование: ${etalon.etalonName}<br>
-                            Номер: ${etalon.etalonNumber}<br>
-                            Тип: ${etalon.calibrationType}<br>
-                            Дата окончания: ${etalon.expiryDate.toLocaleDateString()}
-                        </div>
-                    `;
-                });
-
-                roomsDiv.appendChild(roomDiv);
-
-                // Добавляем опцию для выбора комнаты
-                const option = document.createElement('option');
-                option.value = room;
-                option.textContent = room;
-                roomSelect.appendChild(option);
-            }
+                const editButton = document.createElement('button');
+                editButton.textContent = 'Изменить';
+                editButton.onclick = () => editStandard(index);
+                
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Удалить';
+                deleteButton.onclick = () => deleteStandard(index);
+                
+                listItem.appendChild(editButton);
+                listItem.appendChild(deleteButton);
+                itemsList.appendChild(listItem);
+            });
         }
 
-        function openEtalonModal() {
-            document.getElementById('etalonModal').style.display = 'flex';
-            document.getElementById('etalonName').value = '';
-            document.getElementById('etalonNumber').value = '';
-            document.getElementById('calibrationDate').value = '';
-            document.getElementById('interval').value = '';
+        function editStandard(index) {
+            const standard = standards[index];
+            const name = prompt('Введите новое наименование эталона:', standard.name);
+            const number = prompt('Введите новый номер эталона:', standard.number);
+            const type = prompt('Выберите тип (поверка/калибровка):', standard.type);
+            const date = new Date(prompt('Введите новую дату поверки (ГГГГ-ММ-ДД):', standard.expirationDate.toISOString().split('T')[0]));
+            const interval = parseInt(prompt('Введите новый межповерочный/калибровочный интервал в днях:', (standard.expirationDate - new Date(date)) / (1000 * 60 * 60 * 24)));
+
+            const expirationDate = new Date(date);
+            expirationDate.setDate(expirationDate.getDate() + interval);
+            const daysLeft = Math.ceil((expirationDate - new Date()) / (1000 * 60 * 60 * 24));
+
+            standards[index] = { name, number, expirationDate, daysLeft, type };
+            renderStandards();
         }
 
-        function addEtalon() {
-            const room = document.getElementById('roomSelect').value;
-            const etalonName = document.getElementById('etalonName').value;
-            const etalonNumber = document.getElementById('etalonNumber').value;
-            const calibrationType = document.getElementById('calibrationType').value;
-            const calibrationDate = new Date(document.getElementById('calibrationDate').value);
-            const interval = parseInt(document.getElementById('interval').value);
-            const expiryDate = new Date(calibrationDate);
-            expiryDate.setDate(expiryDate.getDate() + interval);
-
-            if (etalonName && etalonNumber) {
-                rooms[room].push({ etalonName, etalonNumber, calibrationType, calibrationDate, expiryDate });
-                closeModal('etalonModal');
-                renderRooms(); // Обновляем список эталонов в комнатах
+        function deleteStandard(index) {
+            if (confirm('Вы уверены, что хотите удалить эталон?')) {
+                standards.splice(index, 1);
+                renderStandards();
             }
         }
     </script>
+
 </body>
 </html>
