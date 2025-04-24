@@ -84,6 +84,8 @@
         <h3>Добавить эталон</h3>
         <label for="roomSelect">Комната:</label>
         <select id="roomSelect" required></select>
+        <label for="standardName">Наименование:</label>
+        <input type="text" id="standardName" required>
         <label for="standardNumber">Номер:</label>
         <input type="text" id="standardNumber" required>
         <label for="standardDate">Дата:</label>
@@ -137,6 +139,7 @@
 
         document.getElementById('addStandard').addEventListener('click', () => {
             const roomIndex = document.getElementById('roomSelect').value;
+            const name = document.getElementById('standardName').value; // Получаем наименование
             const number = document.getElementById('standardNumber').value;
             const dateInput = new Date(document.getElementById('standardDate').value);
             const interval = parseInt(document.getElementById('interval').value);
@@ -148,7 +151,7 @@
             const daysLeft = Math.ceil((expirationDate - new Date()) / (1000 * 60 * 60 * 24));
 
             const standard = {
-                name: 'Эталон', // Убрано поле наименования
+                name, // Используем введенное наименование
                 number,
                 date: dateInput,
                 type,
@@ -189,6 +192,7 @@
 
         window.editStandard = function(index) {
             const standard = standards[index];
+            const name = prompt('Введите новое наименование эталона:', standard.name);
             const number = prompt('Введите новый номер эталона:', standard.number);
             const dateInput = prompt('Введите новую дату (ГГГГ-ММ-ДД):', standard.date.toISOString().split('T')[0]);
             const date = new Date(dateInput);
@@ -199,6 +203,7 @@
             expirationDate.setMonth(expirationDate.getMonth() + interval);
             const daysLeft = Math.ceil((expirationDate - new Date()) / (1000 * 60 * 60 * 24));
 
+            standard.name = name;
             standard.number = number;
             standard.date = date;
             standard.type = type;
