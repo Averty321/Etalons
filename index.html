@@ -12,13 +12,44 @@
         button {
             margin-right: 10px;
         }
-        #items {
+        table {
             margin-top: 20px;
-            list-style-type: none;
-            padding: 0;
+            width: 100%;
+            border-collapse: collapse;
         }
-        .item {
-            margin-bottom: 10px;
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .actions {
+            display: flex;
+            gap: 5px;
+        }
+        .additional-info {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            border: 1px solid #ccc;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            z-index: 1000;
+        }
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
         }
     </style>
 </head>
@@ -27,79 +58,160 @@
     <button id="createRoom">Создать комнату</button>
     <button id="addStandard">Добавить эталон</button>
 
-    <ul id="items"></ul>
+    <table id="items">
+        <thead>
+            <tr>
+                <th>Наименование</th>
+                <th>Номер</th>
+                <th>Дата</th>
+                <th>Тип</th>
+                <th>Осталось дней</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <div class="overlay" id="overlay"></div>
+    <div class="additional-info" id="additionalInfo">
+        <h3>Дополнительная информация</h3>
+        <table class="additional-info-table">
+            <thead>
+                <tr>
+                    <th>Значение</th>
+                    <th>Поправка</th>
+                </tr>
+            </thead>
+            <tbody id="additionalInfoBody"></tbody>
+        </table>
+        <button id="closeInfo">Закрыть</button>
+    </div>
 
     <script>
         let standards = [];
 
         document.getElementById('createRoom').addEventListener('click', () => {
             alert('Комната создана!');
-            // Логика создания комнаты
         });
 
         document.getElementById('addStandard').addEventListener('click', () => {
             const name = prompt('Введите наименование эталона:');
             const number = prompt('Введите номер эталона:');
-            const type = prompt('Выберите тип (поверка/калибровка):');
-            const date = new Date(prompt('Введите дату поверки (ГГГГ-ММ-ДД):'));
+            const dateInput = prompt('Введите дату (ГГГГ-ММ-ДД):');
+            const date = new Date(dateInput);
             const interval = parseInt(prompt('Введите межповерочный/калибровочный интервал в днях:'));
+            const type = prompt('Введите тип (поверка/калибровка):');
+            const withAdditionalInfo = confirm('Хотите ввести дополнительную информацию?');
 
             const expirationDate = new Date(date);
             expirationDate.setDate(expirationDate.getDate() + interval);
 
             const daysLeft = Math.ceil((expirationDate - new Date()) / (1000 * 60 * 60 * 24));
 
+            if (isNaN(daysLeft) || daysLeft < 0) {
+                alert('Ошибка: проверьте введенные данные.');
+                return;
+            }
+
             const standard = {
                 name,
                 number,
+                date,
+                type,
                 expirationDate,
                 daysLeft,
-                type
+                additionalInfo: withAdditionalInfo ? [] : null
             };
+
+            if (withAdditionalInfo) {
+                addAdditionalInfo(standard);
+            }
 
             standards.push(standard);
             renderStandards();
         });
 
+        function addAdditionalInfo(standard) {
+            const infoCount = parseInt(prompt('Введите количество дополнительных записей (0 если нет):'));
+            for (let i = 0; i < infoCount; i++) {
+                const value = prompt(`Введите значение ${i + 1}:`);
+                const correction = prompt(`Введите поправку для ${value}:`);
+                standard.additionalInfo.push({ value, correction });
+            }
+        }
+
         function renderStandards() {
-            const itemsList = document.getElementById('items');
-            itemsList.innerHTML = '';
+            const tbody = document.querySelector('#items tbody');
+            tbody.innerHTML = '';
             standards.forEach((standard, index) => {
-                const listItem = document.createElement('li');
-                listItem.className = 'item';
-                listItem.textContent = `Комната 901 - Наименование: ${standard.name}, Номер: ${standard.number}, Дата поверки: ${standard.expirationDate.toLocaleDateString()}, Осталось дней: ${standard.daysLeft}`;
-                
-                const editButton = document.createElement('button');
-                editButton.textContent = 'Изменить';
-                editButton.onclick = () => editStandard(index);
-                
-                const deleteButton = document.createElement('button');
-                deleteButton.textContent = 'Удалить';
-                deleteButton.onclick = () => deleteStandard(index);
-                
-                listItem.appendChild(editButton);
-                listItem.appendChild(deleteButton);
-                itemsList.appendChild(listItem);
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><button onclick="showAdditionalInfo(${index})">${standard.name}</button></td>
+                    <td>${standard.number}</td>
+                    <td>${standard.date.toLocaleDateString()}</td>
+                    <td>${standard.type}</td>
+                    <td>${standard.daysLeft}</td>
+                    <td class="actions">
+                        <button onclick="editStandard(${index})">Изменить</button>
+                        <button onclick="deleteStandard(${index})">Удалить</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
             });
         }
 
-        function editStandard(index) {
+        function showAdditionalInfo(index) {
+            const standard = standards[index];
+            const additionalInfoBody = document.getElementById('additionalInfoBody');
+            additionalInfoBody.innerHTML = '';
+
+            if (standard.additionalInfo) {
+                standard.additionalInfo.forEach(info => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `<td>${info.value}</td><td>${info.correction}</td>`;
+                    additionalInfoBody.appendChild(row);
+                });
+            }
+
+            document.getElementById('overlay').style.display = 'block';
+            document.getElementById('additionalInfo').style.display = 'block';
+        }
+
+        document.getElementById('closeInfo').addEventListener('click', () => {
+            document.getElementById('overlay').style.display = 'none';
+            document.getElementById('additionalInfo').style.display = 'none';
+        });
+
+        window.editStandard = function(index) {
             const standard = standards[index];
             const name = prompt('Введите новое наименование эталона:', standard.name);
             const number = prompt('Введите новый номер эталона:', standard.number);
-            const type = prompt('Выберите тип (поверка/калибровка):', standard.type);
-            const date = new Date(prompt('Введите новую дату поверки (ГГГГ-ММ-ДД):', standard.expirationDate.toISOString().split('T')[0]));
+            const dateInput = prompt('Введите новую дату (ГГГГ-ММ-ДД):', standard.date.toISOString().split('T')[0]);
+            const date = new Date(dateInput);
             const interval = parseInt(prompt('Введите новый межповерочный/калибровочный интервал в днях:', (standard.expirationDate - new Date(date)) / (1000 * 60 * 60 * 24)));
+            const type = prompt('Введите новый тип (поверка/калибровка):', standard.type);
+            const withAdditionalInfo = confirm('Хотите ввести дополнительную информацию?');
 
             const expirationDate = new Date(date);
             expirationDate.setDate(expirationDate.getDate() + interval);
             const daysLeft = Math.ceil((expirationDate - new Date()) / (1000 * 60 * 60 * 24));
 
-            standards[index] = { name, number, expirationDate, daysLeft, type };
+            standard.name = name;
+            standard.number = number;
+            standard.date = date;
+            standard.type = type;
+            standard.expirationDate = expirationDate;
+            standard.daysLeft = daysLeft;
+
+            if (withAdditionalInfo) {
+                standard.additionalInfo = [];
+                addAdditionalInfo(standard);
+            }
+
             renderStandards();
         }
 
-        function deleteStandard(index) {
+        window.deleteStandard = function(index) {
             if (confirm('Вы уверены, что хотите удалить эталон?')) {
                 standards.splice(index, 1);
                 renderStandards();
