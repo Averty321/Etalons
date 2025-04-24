@@ -56,7 +56,6 @@
         }
         .etalon {
             margin: 10px 0;
-            padding: 10px;
             border-radius: 5px;
             display: flex;
             justify-content: space-between;
@@ -75,6 +74,20 @@
             border: 1px solid #ddd;
             border-radius: 5px;
             margin-right: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #3498db;
+            color: white;
         }
         textarea {
             width: 100%;
@@ -167,7 +180,19 @@
                 roomDiv.className = 'etalon';
                 roomDiv.innerHTML = `<strong>Комната ${room}</strong>
                                     <button onclick="openEtalonModal('${room}')">Добавить эталон</button>
-                                    <div id="${room}-etalon"></div>`;
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Наименование</th>
+                                                <th>Номер</th>
+                                                <th>Калибровка</th>
+                                                <th>Дата окончания</th>
+                                                <th>Доп. Инф.</th>
+                                                <th>Действия</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="${room}-etalon"></tbody>
+                                    </table>`;
                 roomsDiv.appendChild(roomDiv);
             }
         }
@@ -205,7 +230,7 @@
             etalonDiv.innerHTML = '';
             rooms[room].forEach((etalon, index) => {
                 const daysLeft = Math.ceil((etalon.expiryDate - new Date()) / (1000 * 60 * 60 * 24));
-                const etalonElement = document.createElement('div');
+                const etalonRow = document.createElement('tr');
 
                 // Определение класса для цветового выделения
                 let className = '';
@@ -219,11 +244,16 @@
                     className = 'warning';
                 }
 
-                etalonElement.className = `etalon ${className}`;
-                etalonElement.innerHTML = `<div class="etalon-info">${etalon.etalonName} (${etalon.etalonNumber}) - Осталось: ${daysLeft} дней, Дата: ${etalon.expiryDate.toLocaleDateString()}</div>
-                                          <button onclick="openExtraInfoModal('${room}', ${index})">Доп. Инф.</button>
-                                          <button onclick="confirmDelete('${room}', ${index})">Удалить</button>`;
-                etalonDiv.appendChild(etalonElement);
+                etalonRow.className = className;
+                etalonRow.innerHTML = `
+                    <td>${etalon.etalonName}</td>
+                    <td>${etalon.etalonNumber}</td>
+                    <td>${etalon.calibrationType}</td>
+                    <td>${etalon.expiryDate.toLocaleDateString()}</td>
+                    <td><button onclick="openExtraInfoModal('${room}', ${index})">Доп. Инф.</button></td>
+                    <td><button onclick="confirmDelete('${room}', ${index})">Удалить</button></td>
+                `;
+                etalonDiv.appendChild(etalonRow);
             });
         }
 
