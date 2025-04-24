@@ -29,18 +29,6 @@
             display: flex;
             gap: 5px;
         }
-        .additional-info {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: white;
-            border: 1px solid #ccc;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            z-index: 1000;
-        }
         .overlay {
             display: none;
             position: fixed;
@@ -51,6 +39,19 @@
             background: rgba(0, 0, 0, 0.5);
             z-index: 999;
         }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            border: 1px solid #ccc;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            z-index: 1000;
+            width: 300px;
+        }
         .expired {
             background-color: #ffcccc; /* Красный цвет для просроченных эталонов */
         }
@@ -59,7 +60,7 @@
 <body>
 
     <button id="createRoom">Создать комнату</button>
-    <button id="addStandard">Добавить эталон</button>
+    <button id="openAddStandard">Добавить эталон</button>
 
     <table id="items">
         <thead>
@@ -76,18 +77,23 @@
     </table>
 
     <div class="overlay" id="overlay"></div>
-    <div class="additional-info" id="additionalInfo">
-        <h3>Дополнительная информация</h3>
-        <table class="additional-info-table">
-            <thead>
-                <tr>
-                    <th>Значение</th>
-                    <th>Поправка</th>
-                </tr>
-            </thead>
-            <tbody id="additionalInfoBody"></tbody>
-        </table>
-        <button id="closeInfo">Закрыть</button>
+    <div class="modal" id="addStandardModal">
+        <h3>Добавить эталон</h3>
+        <label for="standardName">Наименование:</label>
+        <input type="text" id="standardName" required>
+        <label for="standardNumber">Номер:</label>
+        <input type="text" id="standardNumber" required>
+        <label for="standardDate">Дата:</label>
+        <input type="date" id="standardDate" required>
+        <label for="interval">Межповерочный интервал (дни):</label>
+        <input type="number" id="interval" required>
+        <label for="type">Тип:</label>
+        <select id="type">
+            <option value="поверка">Поверка</option>
+            <option value="калибровка">Калибровка</option>
+        </select>
+        <button id="addStandard">Добавить</button>
+        <button id="closeModal">Закрыть</button>
     </div>
 
     <script>
@@ -99,21 +105,29 @@
             alert(`Комната ${roomNumber} создана!`);
         });
 
+        document.getElementById('openAddStandard').addEventListener('click', () => {
+            document.getElementById('overlay').style.display = 'block';
+            document.getElementById('addStandardModal').style.display = 'block';
+        });
+
+        document.getElementById('closeModal').addEventListener('click', () => {
+            document.getElementById('overlay').style.display = 'none';
+            document.getElementById('addStandardModal').style.display = 'none';
+        });
+
         document.getElementById('addStandard').addEventListener('click', () => {
             if (!roomNumber) {
                 alert('Сначала создайте комнату!');
                 return;
             }
 
-            const name = prompt('Введите наименование эталона:');
-            const number = prompt('Введите номер эталона:');
-            const dateInput = prompt('Введите дату (ГГГГ-ММ-ДД):');
-            const date = new Date(dateInput);
-            const interval = parseInt(prompt('Введите межповерочный/калибровочный интервал в днях:'));
-            const type = prompt('Введите тип (поверка/калибровка):');
-            const withAdditionalInfo = confirm('Хотите ввести дополнительную информацию?');
+            const name = document.getElementById('standardName').value;
+            const number = document.getElementById('standardNumber').value;
+            const dateInput = new Date(document.getElementById('standardDate').value);
+            const interval = parseInt(document.getElementById('interval').value);
+            const type = document.getElementById('type').value;
 
-            const expirationDate = new Date(date);
+            const expirationDate = new Date(dateInput);
             expirationDate.setDate(expirationDate.getDate() + interval);
 
             const daysLeft = Math.ceil((expirationDate - new Date()) / (1000 * 60 * 60 * 24));
@@ -126,29 +140,17 @@
             const standard = {
                 name,
                 number,
-                date,
+                date: dateInput,
                 type,
                 expirationDate,
                 daysLeft,
-                additionalInfo: withAdditionalInfo ? [] : null
+                additionalInfo: []
             };
-
-            if (withAdditionalInfo) {
-                addAdditionalInfo(standard);
-            }
 
             standards.push(standard);
             renderStandards();
+            closeModal();
         });
-
-        function addAdditionalInfo(standard) {
-            const infoCount = parseInt(prompt('Введите количество дополнительных записей (0 если нет):'));
-            for (let i = 0; i < infoCount; i++) {
-                const value = prompt(`Введите значение ${i + 1}:`);
-                const correction = prompt(`Введите поправку для ${value}:`);
-                standard.additionalInfo.push({ value, correction });
-            }
-        }
 
         function renderStandards() {
             const tbody = document.querySelector('#items tbody');
@@ -190,11 +192,6 @@
             document.getElementById('additionalInfo').style.display = 'block';
         }
 
-        document.getElementById('closeInfo').addEventListener('click', () => {
-            document.getElementById('overlay').style.display = 'none';
-            document.getElementById('additionalInfo').style.display = 'none';
-        });
-
         window.editStandard = function(index) {
             const standard = standards[index];
             const name = prompt('Введите новое наименование эталона:', standard.name);
@@ -203,7 +200,6 @@
             const date = new Date(dateInput);
             const interval = parseInt(prompt('Введите новый межповерочный/калибровочный интервал в днях:', (standard.expirationDate - new Date(date)) / (1000 * 60 * 60 * 24)));
             const type = prompt('Введите новый тип (поверка/калибровка):', standard.type);
-            const withAdditionalInfo = confirm('Хотите ввести дополнительную информацию?');
 
             const expirationDate = new Date(date);
             expirationDate.setDate(expirationDate.getDate() + interval);
@@ -215,11 +211,6 @@
             standard.type = type;
             standard.expirationDate = expirationDate;
             standard.daysLeft = daysLeft;
-
-            if (withAdditionalInfo) {
-                standard.additionalInfo = [];
-                addAdditionalInfo(standard);
-            }
 
             renderStandards();
         }
