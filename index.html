@@ -19,6 +19,7 @@
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            color: black; /* Черный цвет текста для контейнера */
         }
         h1 {
             text-align: center;
@@ -65,8 +66,16 @@
             border-radius: 5px;
             border: 1px solid #ccc;
         }
-        .etalon-list {
+        .room {
             margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .etalon-info {
+            margin: 5px 0;
+            border-top: 1px solid #ccc;
+            padding-top: 5px;
         }
     </style>
 </head>
@@ -134,7 +143,21 @@
 
             for (const room in rooms) {
                 const roomDiv = document.createElement('div');
-                roomDiv.innerHTML = `<strong>Комната ${room}</strong>`;
+                roomDiv.className = 'room';
+                roomDiv.innerHTML = `<strong>Комната ${room}:</strong>`;
+                
+                // Добавляем информацию по эталонам в комнате
+                rooms[room].forEach(etalon => {
+                    roomDiv.innerHTML += `
+                        <div class="etalon-info">
+                            Наименование: ${etalon.etalonName}<br>
+                            Номер: ${etalon.etalonNumber}<br>
+                            Тип: ${etalon.calibrationType}<br>
+                            Дата окончания: ${etalon.expiryDate.toLocaleDateString()}
+                        </div>
+                    `;
+                });
+
                 roomsDiv.appendChild(roomDiv);
 
                 // Добавляем опцию для выбора комнаты
