@@ -120,6 +120,9 @@
             </select>
             <input type="date" id="calibrationDate">
             <input type="number" id="interval" placeholder="Межповерочный интервал (дни)">
+            <label>
+                <input type="checkbox" id="extraInfoCheckbox"> Указать дополнительную информацию
+            </label>
             <button onclick="addEtalon()">Добавить</button>
             <button onclick="closeModal('etalonModal')">Закрыть</button>
         </div>
@@ -176,6 +179,7 @@
             document.getElementById('etalonNumber').value = '';
             document.getElementById('calibrationDate').value = '';
             document.getElementById('interval').value = '';
+            document.getElementById('extraInfoCheckbox').checked = false;
         }
 
         function addEtalon() {
@@ -187,9 +191,10 @@
             const interval = parseInt(document.getElementById('interval').value);
             const expiryDate = new Date(calibrationDate);
             expiryDate.setDate(expiryDate.getDate() + interval);
+            const extraInfo = document.getElementById('extraInfoCheckbox').checked ? '' : null;
 
             if (etalonName && etalonNumber) {
-                rooms[room].push({ etalonName, etalonNumber, calibrationType, calibrationDate, expiryDate, extraInfo: '' });
+                rooms[room].push({ etalonName, etalonNumber, calibrationType, calibrationDate, expiryDate, extraInfo });
                 renderEtalons(room);
                 closeModal('etalonModal');
             }
@@ -201,7 +206,7 @@
             rooms[room].forEach((etalon, index) => {
                 const daysLeft = Math.ceil((etalon.expiryDate - new Date()) / (1000 * 60 * 60 * 24));
                 const etalonElement = document.createElement('div');
-                
+
                 // Определение класса для цветового выделения
                 let className = '';
                 const today = new Date();
@@ -233,6 +238,7 @@
                 const { room, index } = currentEtalon;
                 rooms[room][index].extraInfo = document.getElementById('extraInfo').value;
                 closeModal('extraInfoModal');
+                renderEtalons(room); // Обновление отображения эталонов
             }
         }
 
