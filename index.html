@@ -3,342 +3,156 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Управление эталонами</title>
+    <title>Настройка наклеек</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
         }
-        button {
-            margin-right: 10px;
-        }
         table {
             margin-top: 20px;
-            width: 100%;
             border-collapse: collapse;
-            background-color: #f0f8ff;
+            width: 100%;
         }
         th, td {
-            border: 1px solid #007bff;
-            padding: 10px;
-            text-align: left;
-        }
-        th {
-            background-color: #007bff;
-            color: white;
-        }
-        .actions {
-            display: flex;
-            gap: 5px;
-        }
-        .overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 999;
-        }
-        .modal {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: white;
             border: 1px solid #ccc;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            z-index: 1000;
-            width: 300px;
+            padding: 8px;
+            text-align: center;
         }
-        .expired {
-            background-color: #ffcccc;
+        button {
+            margin-top: 10px;
         }
     </style>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 </head>
 <body>
 
-    <button id="createRoom">Создать расположение</button>
-    <button id="manageRooms">Управление расположениями</button>
-    <button id="openAddStandard">Добавить эталон</button>
+<h1>Настройка наклеек</h1>
+<label for="stickerNumber">Номер наклейки:</label>
+<input type="number" id="stickerNumber" required>
+<br>
+<label for="size">Размер наклеек:</label>
+<select id="size">
+    <option value="16">16 мм</option>
+    <option value="10">10 мм</option>
+</select>
+<br>
+<button id="createTable">Создать таблицу</button>
+<button id="clearData" style="display:none;">Очистить страницу</button>
+<button id="groupData" style="display:none;">Сгруппировать</button>
 
-    <table id="items">
-        <thead>
-            <tr>
-                <th>Наименование</th>
-                <th>Номер</th>
-                <th>Дата метрологической оценки</th>
-                <th>Дата окончания метрологической оценки</th>
-                <th>Вид метрологической оценки</th>
-                <th>Расположение</th>
-                <th>Количество дней до окончания действия</th>
-                <th>Действия</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
+<div id="tableContainer"></div>
 
-    <div class="overlay" id="overlay"></div>
-    <div class="modal" id="addStandardModal">
-        <h3 id="modalTitle">Добавить эталон</h3>
-        <label for="roomSelect">Расположение:</label>
-        <select id="roomSelect" required></select>
-        <label for="standardName">Наименование:</label>
-        <input type="text" id="standardName" required>
-        <label for="standardNumber">Номер:</label>
-        <input type="text" id="standardNumber" required>
-        <label for="standardDate">Дата:</label>
-        <input type="date" id="standardDate" required>
-        <label for="interval">Межповерочный интервал (в годах):</label>
-        <input type="number" id="interval" required min="1">
-        <label for="type">Вид метрологической оценки:</label>
-        <select id="type">
-            <option value="поверка">Поверка</option>
-            <option value="калибровка">Калибровка</option>
-        </select>
-        <button id="saveStandard">Сохранить</button>
-        <button id="closeModal">Закрыть</button>
-    </div>
+<!-- Подключение библиотеки SheetJS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
-    <div class="modal" id="manageRoomsModal">
-        <h3>Управление расположениями</h3>
-        <ul id="roomList"></ul>
-        <button id="closeRoomsModal">Закрыть</button>
-    </div>
+<script>
+    let isGrouped = false; // Флаг для отслеживания, сгруппированы ли данные
 
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyDSP5927ZoXzonz0YN0ROftDmiyxlcEDmc",
-   authDomain: "vlad-etests.firebaseapp.com",
-   databaseURL: "https://vlad-etests-default-rtdb.firebaseio.com",
-   projectId: "vlad-etests",
-   storageBucket: "vlad-etests.firebasestorage.app",
-   messagingSenderId: "587992300108",
-   appId: "1:587992300108:web:48505b9483dba10fadd2e9"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
+    document.getElementById('createTable').addEventListener('click', function () {
+        const stickerNumber = parseInt(document.getElementById('stickerNumber').value);
+        const size = parseInt(document.getElementById('size').value);
+        const totalColumns = size === 16 ? 64 : 144; // Определяем количество столбиков
+        const tableContainer = document.getElementById('tableContainer');
 
-        let standards = [];
-        let rooms = [];
-        let editingStandardIndex = null;
-
-        function updateRoomSelect() {
-            const roomSelect = document.getElementById('roomSelect');
-            roomSelect.innerHTML = '';
-            rooms.forEach((room, index) => {
-                const option = document.createElement('option');
-                option.value = index;
-                option.textContent = room;
-                roomSelect.appendChild(option);
-            });
+        // Создаем таблицу
+        let tableHTML = `<table id="outputTable"><tr><th>#</th><th>Номер наклейки</th><th>Тип прибора</th><th>Номер прибора</th></tr>`;
+        
+        for (let i = 0; i < totalColumns; i++) {
+            const stickerNum = stickerNumber + i;
+            tableHTML += `<tr>
+                <td>${i + 1}</td> <!-- Порядковый номер -->
+                <td>${stickerNum}</td>
+                <td contenteditable="true"></td>
+                <td contenteditable="true"></td>
+            </tr>`;
         }
+        tableHTML += `</table>`;
+        tableContainer.innerHTML = tableHTML;
 
-        function fetchRooms() {
-            database.ref('rooms').on('value', snapshot => {
-                rooms = snapshot.val() || [];
-                updateRoomSelect();
-                renderRoomList();
-            });
-        }
+        // Сохраняем в локальную память
+        localStorage.setItem('stickerData', tableHTML);
+        document.getElementById('clearData').style.display = 'block'; // Показываем кнопку для очистки
+        document.getElementById('groupData').style.display = 'block'; // Показываем кнопку для группировки
+    });
 
-        function fetchStandards() {
-            database.ref('standards').on('value', snapshot => {
-                standards = snapshot.val() || [];
-                calculateDaysLeft(); // Обновляем количество дней до окончания действия
-                renderStandards();
-            });
-        }
+    document.getElementById('groupData').addEventListener('click', function () {
+        const table = document.getElementById('outputTable');
+        const groupedData = {};
 
-        document.getElementById('createRoom').addEventListener('click', () => {
-            const roomName = prompt('Введите название расположения:');
-            if (roomName && roomName.trim() !== '') {
-                rooms.push(roomName);
-                database.ref('rooms').set(rooms);
-                alert(`Расположение "${roomName}" создано!`);
-            } else {
-                alert('Название расположения не может быть пустым!');
-            }
-        });
+        // Группируем данные по типам приборов
+        for (let row of table.rows) {
+            if (row.rowIndex > 0) { // Пропускаем заголовок
+                const stickerNumber = row.cells[1].innerText; // Номер наклейки
+                const deviceType = row.cells[2].innerText; // Тип прибора
+                const deviceNumber = row.cells[3].innerText; // Номер прибора
 
-        document.getElementById('manageRooms').addEventListener('click', () => {
-            document.getElementById('overlay').style.display = 'block';
-            document.getElementById('manageRoomsModal').style.display = 'block';
-            renderRoomList();
-        });
-
-        function renderRoomList() {
-            const roomList = document.getElementById('roomList');
-            roomList.innerHTML = '';
-            rooms.forEach((room, index) => {
-                const li = document.createElement('li');
-                li.textContent = room;
-                li.innerHTML += `
-                    <button onclick="editRoom(${index})">Изменить</button>
-                    <button onclick="deleteRoom(${index})">Удалить</button>
-                `;
-                roomList.appendChild(li);
-            });
-        }
-
-        window.editRoom = function(index) {
-            const newName = prompt('Введите новое название расположения:', rooms[index]);
-            if (newName && newName.trim() !== '') {
-                rooms[index] = newName;
-                database.ref('rooms').set(rooms);
-                renderRoomList();
-                updateRoomSelect();
-            } else {
-                alert('Название расположения не может быть пустым!');
-            }
-        };
-
-        window.deleteRoom = function(index) {
-            const isUsed = standards.some(standard => standard.room === rooms[index]);
-            if (isUsed) {
-                alert('Нельзя удалить расположение, так как оно используется в эталонах!');
-                return;
-            }
-            if (confirm('Вы уверены, что хотите удалить расположение?')) {
-                rooms.splice(index, 1);
-                database.ref('rooms').set(rooms);
-                renderRoomList();
-                updateRoomSelect();
-            }
-        };
-
-        document.getElementById('openAddStandard').addEventListener('click', () => {
-            if (rooms.length === 0) {
-                alert('Сначала создайте расположение!');
-                return;
-            }
-            editingStandardIndex = null;
-            document.getElementById('modalTitle').textContent = 'Добавить эталон';
-            document.getElementById('standardName').value = '';
-            document.getElementById('standardNumber').value = '';
-            document.getElementById('standardDate').value = '';
-            document.getElementById('interval').value = '';
-            document.getElementById('type').value = 'поверка';
-            document.getElementById('overlay').style.display = 'block';
-            document.getElementById('addStandardModal').style.display = 'block';
-        });
-
-        document.getElementById('closeModal').addEventListener('click', () => {
-            document.getElementById('overlay').style.display = 'none';
-            document.getElementById('addStandardModal').style.display = 'none';
-        });
-
-        document.getElementById('closeRoomsModal').addEventListener('click', () => {
-            document.getElementById('overlay').style.display = 'none';
-            document.getElementById('manageRoomsModal').style.display = 'none';
-        });
-
-        document.getElementById('saveStandard').addEventListener('click', () => {
-            const roomIndex = document.getElementById('roomSelect').value;
-            const name = document.getElementById('standardName').value.trim();
-            const number = document.getElementById('standardNumber').value.trim();
-            const dateInput = new Date(document.getElementById('standardDate').value);
-            const interval = parseInt(document.getElementById('interval').value);
-            const type = document.getElementById('type').value;
-
-            if (!name || !number || isNaN(interval) || !dateInput || roomIndex === "") {
-                alert('Пожалуйста, заполните все поля!');
-                return;
-            }
-
-            const expirationDateInput = new Date(dateInput);
-            expirationDateInput.setFullYear(expirationDateInput.getFullYear() + interval);
-            expirationDateInput.setDate(expirationDateInput.getDate() - 1); // Уменьшение на 1 день
-
-            const standard = {
-                name,
-                number,
-                date: dateInput.toISOString(),
-                type,
-                room: rooms[roomIndex],
-                expirationDate: expirationDateInput.toISOString()
-            };
-
-            if (editingStandardIndex !== null) {
-                standards[editingStandardIndex] = standard;
-                alert('Эталон изменен!');
-            } else {
-                standards.push(standard);
-                alert('Эталон добавлен!');
-            }
-
-            database.ref('standards').set(standards);
-            calculateDaysLeft(); // Обновляем количество дней до окончания действия
-            renderStandards();
-            document.getElementById('overlay').style.display = 'none';
-            document.getElementById('addStandardModal').style.display = 'none';
-        });
-
-        function calculateDaysLeft() {
-            standards.forEach(standard => {
-                const expirationDate = new Date(standard.expirationDate);
-                const daysLeft = Math.ceil((expirationDate - new Date()) / (1000 * 60 * 60 * 24));
-                standard.daysLeft = daysLeft;
-            });
-        }
-
-        function renderStandards() {
-            const tbody = document.querySelector('#items tbody');
-            tbody.innerHTML = '';
-            standards.forEach((standard, index) => {
-                const row = document.createElement('tr');
-                if (standard.daysLeft < 0) {
-                    row.classList.add('expired');
+                if (deviceType) {
+                    if (!groupedData[deviceType]) {
+                        groupedData[deviceType] = [];
+                    }
+                    groupedData[deviceType].push([stickerNumber, deviceNumber]);
                 }
-                row.innerHTML = `
-                    <td>${standard.name}</td>
-                    <td>${standard.number}</td>
-                    <td>${new Date(standard.date).toLocaleDateString()}</td>
-                    <td>${new Date(standard.expirationDate).toLocaleDateString()}</td>
-                    <td>${standard.type}</td>
-                    <td>${standard.room}</td>
-                    <td>${standard.daysLeft}</td>
-                    <td class="actions">
-                        <button onclick="editStandard(${index})">Изменить</button>
-                        <button onclick="deleteStandard(${index})">Удалить</button>
-                    </td>
-                `;
-                tbody.appendChild(row);
-            });
+            }
         }
 
-        window.editStandard = function(index) {
-            const standard = standards[index];
-            document.getElementById('modalTitle').textContent = 'Изменить эталон';
-            document.getElementById('standardName').value = standard.name;
-            document.getElementById('standardNumber').value = standard.number;
-            document.getElementById('standardDate').value = new Date(standard.date).toISOString().split('T')[0];
-            document.getElementById('interval').value = (new Date(standard.expirationDate).getFullYear() - new Date(standard.date).getFullYear());
-            document.getElementById('type').value = standard.type;
-            document.getElementById('roomSelect').value = rooms.indexOf(standard.room);
-            editingStandardIndex = index;
-
-            document.getElementById('overlay').style.display = 'block';
-            document.getElementById('addStandardModal').style.display = 'block';
-        };
-
-        window.deleteStandard = function(index) {
-            if (confirm('Вы уверены, что хотите удалить эталон?')) {
-                standards.splice(index, 1);
-                database.ref('standards').set(standards);
-                renderStandards();
+        // Создаем новые таблицы для каждого типа прибора
+        const newTablesContainer = document.createElement('div');
+        for (let deviceType in groupedData) {
+            let newTableHTML = `<table class="deviceTable"><tr><th>Номер наклейки</th><th>Номер прибора</th></tr>`;
+            for (let record of groupedData[deviceType]) {
+                newTableHTML += `<tr><td>${record[0]}</td><td>${record[1]}</td></tr>`;
             }
-        };
+            newTableHTML += `</table>`;
+            
+            // Добавляем кнопку для сохранения таблицы
+            newTableHTML += `<button onclick="saveTable(this, '${deviceType}')">Сохранить ${deviceType}</button>`;
+            newTablesContainer.innerHTML += `<h2>${deviceType}</h2>` + newTableHTML;
+        }
 
-        // Инициализация данных
-        fetchRooms();
-        fetchStandards();
-    </script>
+        tableContainer.appendChild(newTablesContainer);
+        isGrouped = true; // Устанавливаем флаг в true
+    });
+
+    function saveTable(button, deviceType) {
+        const table = button.previousElementSibling; // Получаем таблицу, которая идет перед кнопкой
+        const rows = table.querySelectorAll('tr');
+        const data = [];
+
+        // Преобразуем HTML-таблицу в массив для Excel
+        rows.forEach((row, index) => {
+            const cells = row.querySelectorAll('td, th');
+            const rowData = [];
+            cells.forEach(cell => rowData.push(cell.innerText));
+            data.push(rowData);
+        });
+
+        // Создаем файл Excel
+        const ws = XLSX.utils.aoa_to_sheet(data); // Преобразуем массив данных в лист
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, deviceType);
+
+        // Сохраняем Excel-файл
+        XLSX.writeFile(wb, `${deviceType}.xls`); // Сохраняем с расширением .xls
+    }
+
+    document.getElementById('clearData').addEventListener('click', function () {
+        localStorage.removeItem('stickerData'); // Очищаем данные из локальной памяти
+        document.getElementById('tableContainer').innerHTML = ''; // Очищаем таблицу на странице
+        document.getElementById('clearData').style.display = 'none'; // Скрываем кнопку очистки
+        document.getElementById('groupData').style.display = 'none'; // Скрываем кнопку группировки
+        isGrouped = false; // Сбрасываем флаг
+    });
+
+    // Загрузка данных из локальной памяти при загрузке страницы
+    window.onload = function () {
+        const savedData = localStorage.getItem('stickerData');
+        if (savedData) {
+            document.getElementById('tableContainer').innerHTML = savedData;
+            document.getElementById('clearData').style.display = 'block'; // Показываем кнопку для очистки
+            document.getElementById('groupData').style.display = 'block'; // Показываем кнопку для группировки
+        }
+    };
+</script>
 
 </body>
 </html>
