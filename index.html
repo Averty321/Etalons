@@ -95,14 +95,15 @@
             }
         }
 
-        // Создаем новые таблицы для каждого типа прибора
+           // Создаем новые таблицы для каждого типа прибора
         const newTablesContainer = document.createElement('div');
         for (let deviceType in groupedData) {
+            let newTableHTML = `<table class="deviceTable"><tr><th></th><th></th></tr>`;
             for (let record of groupedData[deviceType]) {
                 newTableHTML += `<tr><td>${record[0]}</td><td>${record[1]}</td></tr>`;
             }
             newTableHTML += `</table>`;
-            
+
             // Добавляем кнопку для сохранения таблицы
             newTableHTML += `<button onclick="saveTable(this, '${deviceType}')">Сохранить ${deviceType}</button>`;
             newTablesContainer.innerHTML += `<h2>${deviceType}</h2>` + newTableHTML;
