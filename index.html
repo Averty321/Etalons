@@ -3,164 +3,651 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Настройка наклеек</title>
+    <title>Средневековые Шахматы: Рыцарская Битва</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
+            font-family: 'Times New Roman', serif;
+            background-color: #f0d9b5;
+            color: #5a3921;
+            margin: 0;
+            padding: 20px;
+            background-image: url('https://images.unsplash.com/photo-1579547945413-497e1b99dac0?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
         }
-        table {
-            margin-top: 20px;
-            border-collapse: collapse;
-            width: 100%;
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: rgba(240, 217, 181, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            border: 2px solid #5a3921;
         }
-        th, td {
-            border: 1px solid #ccc;
-            padding: 8px;
+        
+        h1 {
             text-align: center;
+            color: #8b4513;
+            text-shadow: 1px 1px 2px #000;
+            font-size: 2.5em;
+            margin-bottom: 10px;
         }
-        td[contenteditable="true"] {
-            background-color: #f9f9f9;
+        
+        .subtitle {
+            text-align: center;
+            font-style: italic;
+            margin-bottom: 30px;
         }
+        
+        .chessboard {
+            width: 400px;
+            height: 400px;
+            margin: 20px auto;
+            border: 10px solid #5a3921;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
+        }
+        
+        .row {
+            display: flex;
+            height: 12.5%;
+        }
+        
+        .square {
+            width: 12.5%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 30px;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .light {
+            background-color: #f0d9b5;
+        }
+        
+        .dark {
+            background-color: #b58863;
+        }
+        
+        .selected {
+            background-color: rgba(0, 100, 0, 0.5);
+        }
+        
+        .possible-move {
+            background-color: rgba(0, 100, 0, 0.3);
+        }
+        
+        .controls {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
         button {
-            margin-top: 10px;
+            background-color: #8b4513;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 0 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #5a3921;
+        }
+        
+        .piece-info {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: rgba(245, 222, 179, 0.7);
+            border-radius: 5px;
+            border: 1px solid #5a3921;
+        }
+        
+        .game-settings {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: rgba(245, 222, 179, 0.7);
+            border-radius: 5px;
+            border: 1px solid #5a3921;
+        }
+        
+        select {
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #5a3921;
+            background-color: #f0d9b5;
+            color: #5a3921;
+            font-size: 16px;
+            margin-left: 10px;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #5a3921;
+        }
+        
+        .status {
+            text-align: center;
+            font-weight: bold;
+            margin: 10px 0;
+            font-size: 18px;
         }
     </style>
 </head>
 <body>
-
-<h1>Настройка наклеек</h1>
-<label for="stickerNumber">Номер наклейки:</label>
-<input type="number" id="stickerNumber" required>
-<br>
-<label for="size">Размер наклеек:</label>
-<select id="size">
-    <option value="16">16 мм</option>
-    <option value="10">10 мм</option>
-</select>
-<br>
-<button id="createTable">Создать таблицу</button>
-<button id="clearData" style="display:none;">Очистить страницу</button>
-<button id="downloadWord" style="display:none;">Скачать таблицу в Word</button>
-<button id="groupData" style="display:none;">Сгруппировать</button>
-
-<div id="tableContainer"></div>
-
-<!-- Подключение библиотеки FileSaver -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-
-<script>
-    document.getElementById('createTable').addEventListener('click', function () {
-        const stickerNumber = parseInt(document.getElementById('stickerNumber').value);
-        const size = parseInt(document.getElementById('size').value);
-        const totalColumns = size === 16 ? 64 : 144; // Определяем количество столбиков
-        const tableContainer = document.getElementById('tableContainer');
-
-        // Создаем таблицу
-        let tableHTML = `<table id="outputTable"><tr>
-            <th>#</th>
-            <th>Номер наклейки</th>
-            <th>Дата</th>
-            <th>Номер заказчика</th>
-            <th>Номер квитанции счета</th>
-            <th>Тип прибора</th>
-            <th>Номер прибора</th>
-            <th>Примечания</th>
-        </tr>`;
+    <div class="container">
+        <h1>Средневековые Шахматы</h1>
+        <p class="subtitle">Рыцарская Битва за Королевство</p>
         
-        for (let i = 0; i < totalColumns; i++) {
-            const stickerNum = stickerNumber + i;
-            tableHTML += `<tr>
-                <td>${i + 1}</td> <!-- Порядковый номер -->
-                <td>${stickerNum}</td>
-                <td contenteditable="true"></td>
-                <td contenteditable="true"></td>
-                <td contenteditable="true"></td>
-                <td contenteditable="true"></td>
-                <td contenteditable="true"></td>
-                <td contenteditable="true"></td>
-            </tr>`;
-        }
-        tableHTML += `</table>`;
-        tableContainer.innerHTML = tableHTML;
+        <div class="status" id="status">Ваш ход (Белые)</div>
+        
+        <div class="chessboard" id="chessboard">
+            <!-- Доска будет сгенерирована JavaScript -->
+        </div>
+        
+        <div class="game-settings">
+            <h3>Настройки игры:</h3>
+            <label>Игра против:
+                <select id="opponentType">
+                    <option value="human">Человека</option>
+                    <option value="bot">Бота</option>
+                </select>
+            </label>
+            
+            <label id="botLevelLabel" style="display: none;">Уровень бота:
+                <select id="botLevel">
+                    <option value="easy">Новичок (Легкий)</option>
+                    <option value="medium">Воин (Средний)</option>
+                    <option value="hard">Мастер (Сложный)</option>
+                </select>
+            </label>
+        </div>
+        
+        <div class="controls">
+            <button id="newGame">Новая Игра</button>
+            <button id="undoMove">Отменить Ход</button>
+        </div>
+        
+        <div class="piece-info" id="pieceInfo">
+            <h3>Средневековые фигуры:</h3>
+            <p><strong>♔ ♚</strong> - Король и Королева</p>
+            <p><strong>♖ ♜</strong> - Ладьи (Крепостные башни)</p>
+            <p><strong>♘ ♞</strong> - Рыцари на конях</p>
+            <p><strong>♗ ♝</strong> - Епископы (Советники)</p>
+            <p><strong>♕ ♛</strong> - Королевские Гвардейцы</p>
+            <p><strong>♙ ♟</strong> - Пешие Воины</p>
+        </div>
+        
+        <footer>
+            © 2023 Средневековые Шахматы | Создано для рыцарских турниров
+        </footer>
+    </div>
 
-        // Сохраняем в локальную память
-        localStorage.setItem('stickerData', tableHTML);
-        document.getElementById('clearData').style.display = 'block'; // Показываем кнопку для очистки
-        document.getElementById('downloadWord').style.display = 'block'; // Показываем кнопку для скачивания Word
-        document.getElementById('groupData').style.display = 'block'; // Показываем кнопку для группировки
-
-        // Добавляем обработчик для перехода по пустым ячейкам
-        enableEnterToNextCell();
-    });
-
-    function enableEnterToNextCell() {
-        const table = document.getElementById('outputTable');
-        const editableCells = table.querySelectorAll('td[contenteditable="true"]');
-
-        editableCells.forEach((cell, index) => {
-            cell.addEventListener('keydown', function (event) {
-                if (event.key === 'Enter') {
-                    event.preventDefault(); // Предотвращаем перенос строки
-                    const nextCell = findNextEditableCell(editableCells, index + 1);
-                    if (nextCell) {
-                        nextCell.focus(); // Переходим к следующей пустой ячейке
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const chessboard = document.getElementById('chessboard');
+            const statusElement = document.getElementById('status');
+            const newGameBtn = document.getElementById('newGame');
+            const undoMoveBtn = document.getElementById('undoMove');
+            const opponentTypeSelect = document.getElementById('opponentType');
+            const botLevelSelect = document.getElementById('botLevel');
+            const botLevelLabel = document.getElementById('botLevelLabel');
+            
+            // Шахматные фигуры с средневековой тематикой
+            const pieces = {
+                'r': '♜', // Черная ладья (крепостная башня)
+                'n': '♞', // Черный конь (рыцарь)
+                'b': '♝', // Черный слон (епископ)
+                'q': '♛', // Черный ферзь (королевский гвардеец)
+                'k': '♚', // Черный король
+                'p': '♟', // Черная пешка (пеший воин)
+                
+                'R': '♖', // Белая ладья
+                'N': '♘', // Белый конь
+                'B': '♗', // Белый слон
+                'Q': '♕', // Белый ферзь
+                'K': '♔', // Белый король
+                'P': '♙'  // Белая пешка
+            };
+            
+            // Начальная позиция
+            let board = [
+                ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'],
+                ['p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'],
+                ['', '', '', '', '', '', '', ''],
+                ['', '', '', '', '', '', '', ''],
+                ['', '', '', '', '', '', '', ''],
+                ['', '', '', '', '', '', '', ''],
+                ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'],
+                ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R']
+            ];
+            
+            let selectedPiece = null;
+            let possibleMoves = [];
+            let moveHistory = [];
+            let currentPlayer = 'white';
+            let gameMode = 'human'; // 'human' или 'bot'
+            let botLevel = 'easy';
+            let gameActive = true;
+            
+            // Показать/скрыть настройки уровня бота
+            opponentTypeSelect.addEventListener('change', function() {
+                gameMode = this.value;
+                botLevelLabel.style.display = gameMode === 'bot' ? 'inline-block' : 'none';
+                updateStatus();
+            });
+            
+            botLevelSelect.addEventListener('change', function() {
+                botLevel = this.value;
+            });
+            
+            // Создание доски
+            function createBoard() {
+                chessboard.innerHTML = '';
+                
+                for (let row = 0; row < 8; row++) {
+                    const rowElement = document.createElement('div');
+                    rowElement.className = 'row';
+                    
+                    for (let col = 0; col < 8; col++) {
+                        const square = document.createElement('div');
+                        square.className = `square ${(row + col) % 2 === 0 ? 'light' : 'dark'}`;
+                        square.dataset.row = row;
+                        square.dataset.col = col;
+                        
+                        if (board[row][col] !== '') {
+                            const piece = document.createElement('div');
+                            piece.textContent = pieces[board[row][col]];
+                            piece.style.cursor = 'pointer';
+                            square.appendChild(piece);
+                        }
+                        
+                        square.addEventListener('click', () => handleSquareClick(row, col));
+                        rowElement.appendChild(square);
+                    }
+                    
+                    chessboard.appendChild(rowElement);
+                }
+            }
+            
+            // Обработка клика по клетке
+            function handleSquareClick(row, col) {
+                if (!gameActive) return;
+                
+                // Если это ход бота, игнорируем клики
+                if (gameMode === 'bot' && currentPlayer === 'black') return;
+                
+                // Если есть возможные ходы и кликнули на один из них
+                if (possibleMoves.some(move => move.row === row && move.col === col)) {
+                    makeMove(selectedPiece.row, selectedPiece.col, row, col);
+                    return;
+                }
+                
+                // Если клетка пустая или фигура другого цвета, сбрасываем выделение
+                if (board[row][col] === '' || 
+                    (currentPlayer === 'white' && board[row][col] === board[row][col].toLowerCase()) ||
+                    (currentPlayer === 'black' && board[row][col] === board[row][col].toUpperCase())) {
+                    selectedPiece = null;
+                    possibleMoves = [];
+                    createBoard();
+                    return;
+                }
+                
+                // Выбираем фигуру
+                selectedPiece = { row, col };
+                possibleMoves = getPossibleMoves(row, col);
+                createBoard();
+                
+                // Подсвечиваем выбранную фигуру и возможные ходы
+                const squares = document.querySelectorAll('.square');
+                squares.forEach(square => {
+                    const squareRow = parseInt(square.dataset.row);
+                    const squareCol = parseInt(square.dataset.col);
+                    
+                    if (squareRow === row && squareCol === col) {
+                        square.classList.add('selected');
+                    }
+                    
+                    if (possibleMoves.some(move => move.row === squareRow && move.col === squareCol)) {
+                        square.classList.add('possible-move');
+                    }
+                });
+            }
+            
+            // Выполнение хода
+            function makeMove(fromRow, fromCol, toRow, toCol) {
+                moveHistory.push(JSON.parse(JSON.stringify(board))); // Сохраняем состояние доски
+                
+                // Выполняем ход
+                board[toRow][toCol] = board[fromRow][fromCol];
+                board[fromRow][fromCol] = '';
+                
+                // Меняем игрока
+                currentPlayer = currentPlayer === 'white' ? 'black' : 'white';
+                
+                // Сбрасываем выделение
+                selectedPiece = null;
+                possibleMoves = [];
+                createBoard();
+                updateStatus();
+                
+                // Если играем против бота и теперь его ход
+                if (gameMode === 'bot' && currentPlayer === 'black' && gameActive) {
+                    setTimeout(makeBotMove, 500); // Задержка для визуализации
+                }
+            }
+            
+            // Ход бота
+            function makeBotMove() {
+                let moves = [];
+                
+                // Собираем все возможные ходы для черных
+                for (let row = 0; row < 8; row++) {
+                    for (let col = 0; col < 8; col++) {
+                        if (board[row][col] !== '' && board[row][col] === board[row][col].toLowerCase()) {
+                            const pieceMoves = getPossibleMoves(row, col);
+                            pieceMoves.forEach(move => {
+                                moves.push({
+                                    from: { row, col },
+                                    to: move
+                                });
+                            });
+                        }
                     }
                 }
-            });
-        });
-    }
-
-    function findNextEditableCell(cells, startIndex) {
-        for (let i = startIndex; i < cells.length; i++) {
-            if (cells[i].innerText.trim() === '') {
-                return cells[i];
+                
+                if (moves.length === 0) {
+                    // Нет возможных ходов - мат или пат
+                    gameActive = false;
+                    updateStatus();
+                    return;
+                }
+                
+                // Выбираем ход в зависимости от уровня сложности
+                let selectedMove;
+                
+                switch (botLevel) {
+                    case 'easy': // Легкий - случайный ход
+                        selectedMove = moves[Math.floor(Math.random() * moves.length)];
+                        break;
+                        
+                    case 'medium': // Средний - иногда берет фигуры, если есть возможность
+                        const capturingMoves = moves.filter(move => 
+                            board[move.to.row][move.to.col] !== '' && 
+                            board[move.to.row][move.to.col] === board[move.to.row][move.to.col].toUpperCase());
+                        
+                        if (capturingMoves.length > 0 && Math.random() > 0.3) {
+                            selectedMove = capturingMoves[Math.floor(Math.random() * capturingMoves.length)];
+                        } else {
+                            selectedMove = moves[Math.floor(Math.random() * moves.length)];
+                        }
+                        break;
+                        
+                    case 'hard': // Сложный - старается брать фигуры и защищать свои
+                        // Сначала ищем взятия
+                        const allCapturingMoves = moves.filter(move => 
+                            board[move.to.row][move.to.col] !== '' && 
+                            board[move.to.row][move.to.col] === board[move.to.row][move.to.col].toUpperCase());
+                        
+                        if (allCapturingMoves.length > 0) {
+                            // Выбираем взятие с самой ценной фигурой
+                            selectedMove = allCapturingMoves.reduce((best, current) => {
+                                const currentPiece = board[current.to.row][current.to.col];
+                                const bestPiece = best ? board[best.to.row][best.to.col] : '';
+                                return getPieceValue(currentPiece) > getPieceValue(bestPiece) ? current : best;
+                            }, allCapturingMoves[0]);
+                        } else {
+                            // Если нет взятий, делаем случайный ход
+                            selectedMove = moves[Math.floor(Math.random() * moves.length)];
+                        }
+                        break;
+                }
+                
+                // Выполняем выбранный ход
+                makeMove(selectedMove.from.row, selectedMove.from.col, selectedMove.to.row, selectedMove.to.col);
             }
-        }
-        return null; // Если пустых ячеек больше нет
-    }
-
-    document.getElementById('clearData').addEventListener('click', function () {
-        localStorage.removeItem('stickerData'); // Очищаем данные из локальной памяти
-        document.getElementById('tableContainer').innerHTML = ''; // Очищаем таблицу на странице
-        document.getElementById('clearData').style.display = 'none'; // Скрываем кнопку очистки
-        document.getElementById('downloadWord').style.display = 'none'; // Скрываем кнопку скачивания Word
-        document.getElementById('groupData').style.display = 'none'; // Скрываем кнопку группировки
-    });
-
-    document.getElementById('downloadWord').addEventListener('click', function () {
-        const table = document.getElementById('outputTable');
-        const rows = table.querySelectorAll('tr');
-        let content = '<table border="1" style="border-collapse:collapse;width:100%;">';
-
-        // Преобразуем HTML-таблицу в HTML-структуру для Word
-        rows.forEach(row => {
-            content += '<tr>';
-            const cells = row.querySelectorAll('td, th');
-            cells.forEach(cell => content += `<td>${cell.innerText}</td>`);
-            content += '</tr>';
+            
+            // Значение фигуры для бота
+            function getPieceValue(piece) {
+                if (!piece) return 0;
+                const lowerPiece = piece.toLowerCase();
+                switch (lowerPiece) {
+                    case 'p': return 1;
+                    case 'n': case 'b': return 3;
+                    case 'r': return 5;
+                    case 'q': return 9;
+                    case 'k': return 100;
+                    default: return 0;
+                }
+            }
+            
+            // Получение возможных ходов (упрощенная версия)
+            function getPossibleMoves(row, col) {
+                const piece = board[row][col];
+                const moves = [];
+                
+                if (piece === '') return moves;
+                
+                const isWhite = piece === piece.toUpperCase();
+                
+                // Пешка
+                if (piece.toLowerCase() === 'p') {
+                    if (isWhite) {
+                        // Ход вперед
+                        if (row > 0 && board[row-1][col] === '') {
+                            moves.push({ row: row-1, col });
+                            // Двойной ход с начальной позиции
+                            if (row === 6 && board[row-2][col] === '') {
+                                moves.push({ row: row-2, col });
+                            }
+                        }
+                        
+                        // Взятие
+                        if (row > 0 && col > 0 && board[row-1][col-1] !== '' && board[row-1][col-1] === board[row-1][col-1].toLowerCase()) {
+                            moves.push({ row: row-1, col: col-1 });
+                        }
+                        if (row > 0 && col < 7 && board[row-1][col+1] !== '' && board[row-1][col+1] === board[row-1][col+1].toLowerCase()) {
+                            moves.push({ row: row-1, col: col+1 });
+                        }
+                    } else {
+                        // Ход вперед
+                        if (row < 7 && board[row+1][col] === '') {
+                            moves.push({ row: row+1, col });
+                            // Двойной ход с начальной позиции
+                            if (row === 1 && board[row+2][col] === '') {
+                                moves.push({ row: row+2, col });
+                            }
+                        }
+                        
+                        // Взятие
+                        if (row < 7 && col > 0 && board[row+1][col-1] !== '' && board[row+1][col-1] === board[row+1][col-1].toUpperCase()) {
+                            moves.push({ row: row+1, col: col-1 });
+                        }
+                        if (row < 7 && col < 7 && board[row+1][col+1] !== '' && board[row+1][col+1] === board[row+1][col+1].toUpperCase()) {
+                            moves.push({ row: row+1, col: col+1 });
+                        }
+                    }
+                }
+                // Ладья
+                else if (piece.toLowerCase() === 'r') {
+                    const directions = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+                    for (const [dr, dc] of directions) {
+                        for (let i = 1; i < 8; i++) {
+                            const newRow = row + dr * i;
+                            const newCol = col + dc * i;
+                            if (newRow < 0 || newRow > 7 || newCol < 0 || newCol > 7) break;
+                            
+                            if (board[newRow][newCol] === '') {
+                                moves.push({ row: newRow, col: newCol });
+                            } else {
+                                if ((isWhite && board[newRow][newCol] === board[newRow][newCol].toLowerCase()) ||
+                                    (!isWhite && board[newRow][newCol] === board[newRow][newCol].toUpperCase())) {
+                                    moves.push({ row: newRow, col: newCol });
+                                }
+                                break;
+                            }
+                        }
+                    }
+                }
+                // Конь
+                else if (piece.toLowerCase() === 'n') {
+                    const knightMoves = [
+                        [-2, -1], [-2, 1], [-1, -2], [-1, 2],
+                        [1, -2], [1, 2], [2, -1], [2, 1]
+                    ];
+                    
+                    for (const [dr, dc] of knightMoves) {
+                        const newRow = row + dr;
+                        const newCol = col + dc;
+                        if (newRow >= 0 && newRow < 8 && newCol >= 0 && newCol < 8) {
+                            if (board[newRow][newCol] === '' || 
+                                (isWhite && board[newRow][newCol] === board[newRow][newCol].toLowerCase()) ||
+                                (!isWhite && board[newRow][newCol] === board[newRow][newCol].toUpperCase())) {
+                                moves.push({ row: newRow, col: newCol });
+                            }
+                        }
+                    }
+                }
+                // Слон
+                else if (piece.toLowerCase() === 'b') {
+                    const directions = [[-1, -1], [-1, 1], [1, -1], [1, 1]];
+                    for (const [dr, dc] of directions) {
+                        for (let i = 1; i < 8; i++) {
+                            const newRow = row + dr * i;
+                            const newCol = col + dc * i;
+                            if (newRow < 0 || newRow > 7 || newCol < 0 || newCol > 7) break;
+                            
+                            if (board[newRow][newCol] === '') {
+                                moves.push({ row: newRow, col: newCol });
+                            } else {
+                                if ((isWhite && board[newRow][newCol] === board[newRow][newCol].toLowerCase()) ||
+                                    (!isWhite && board[newRow][newCol] === board[newRow][newCol].toUpperCase())) {
+                                    moves.push({ row: newRow, col: newCol });
+                                }
+                                break;
+                            }
+                        }
+                    }
+                }
+                // Ферзь
+                else if (piece.toLowerCase() === 'q') {
+                    // Комбинация ладьи и слона
+                    const directions = [
+                        [-1, 0], [1, 0], [0, -1], [0, 1], // Ладья
+                        [-1, -1], [-1, 1], [1, -1], [1, 1] // Слон
+                    ];
+                    
+                    for (const [dr, dc] of directions) {
+                        for (let i = 1; i < 8; i++) {
+                            const newRow = row + dr * i;
+                            const newCol = col + dc * i;
+                            if (newRow < 0 || newRow > 7 || newCol < 0 || newCol > 7) break;
+                            
+                            if (board[newRow][newCol] === '') {
+                                moves.push({ row: newRow, col: newCol });
+                            } else {
+                                if ((isWhite && board[newRow][newCol] === board[newRow][newCol].toLowerCase()) ||
+                                    (!isWhite && board[newRow][newCol] === board[newRow][newCol].toUpperCase())) {
+                                    moves.push({ row: newRow, col: newCol });
+                                }
+                                break;
+                            }
+                        }
+                    }
+                }
+                // Король
+                else if (piece.toLowerCase() === 'k') {
+                    const kingMoves = [
+                        [-1, -1], [-1, 0], [-1, 1],
+                        [0, -1], [0, 1],
+                        [1, -1], [1, 0], [1, 1]
+                    ];
+                    
+                    for (const [dr, dc] of kingMoves) {
+                        const newRow = row + dr;
+                        const newCol = col + dc;
+                        if (newRow >= 0 && newRow < 8 && newCol >= 0 && newCol < 8) {
+                            if (board[newRow][newCol] === '' || 
+                                (isWhite && board[newRow][newCol] === board[newRow][newCol].toLowerCase()) ||
+                                (!isWhite && board[newRow][newCol] === board[newRow][newCol].toUpperCase())) {
+                                moves.push({ row: newRow, col: newCol });
+                            }
+                        }
+                    }
+                }
+                
+                return moves;
+            }
+            
+            // Обновление статуса игры
+            function updateStatus() {
+                if (!gameActive) {
+                    statusElement.textContent = `Игра окончена. ${currentPlayer === 'white' ? 'Черные победили!' : 'Белые победили!'}`;
+                    return;
+                }
+                
+                if (gameMode === 'bot') {
+                    statusElement.textContent = currentPlayer === 'white' 
+                        ? 'Ваш ход (Белые)' 
+                        : 'Бот думает...';
+                } else {
+                    statusElement.textContent = currentPlayer === 'white' 
+                        ? 'Ход белых' 
+                        : 'Ход черных';
+                }
+            }
+            
+            // Новая игра
+            newGameBtn.addEventListener('click', function() {
+                board = [
+                    ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'],
+                    ['p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'],
+                    ['', '', '', '', '', '', '', ''],
+                    ['', '', '', '', '', '', '', ''],
+                    ['', '', '', '', '', '', '', ''],
+                    ['', '', '', '', '', '', '', ''],
+                    ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'],
+                    ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R']
+                ];
+                selectedPiece = null;
+                possibleMoves = [];
+                moveHistory = [];
+                currentPlayer = 'white';
+                gameActive = true;
+                createBoard();
+                updateStatus();
+                
+                // Если играем против бота и он играет белыми
+                if (gameMode === 'bot' && botLevelSelect.value === 'hard') {
+                    currentPlayer = 'black'; // Для сложного уровня пусть бот играет черными
+                    setTimeout(makeBotMove, 500);
+                }
+            });
+            
+            // Отмена хода
+            undoMoveBtn.addEventListener('click', function() {
+                if (moveHistory.length > 0) {
+                    board = moveHistory.pop();
+                    currentPlayer = currentPlayer === 'white' ? 'black' : 'white';
+                    selectedPiece = null;
+                    possibleMoves = [];
+                    gameActive = true;
+                    createBoard();
+                    updateStatus();
+                }
+            });
+            
+            // Инициализация доски
+            createBoard();
+            updateStatus();
         });
-        content += '</table>';
-
-        // Создаем файл Word
-        const blob = new Blob([content], { type: 'application/msword' });
-        saveAs(blob, 'Таблица.doc');
-    });
-
-    // Загрузка данных из локальной памяти при загрузке страницы
-    window.onload = function () {
-        const savedData = localStorage.getItem('stickerData');
-        if (savedData) {
-            document.getElementById('tableContainer').innerHTML = savedData;
-            document.getElementById('clearData').style.display = 'block'; // Показываем кнопку для очистки
-            document.getElementById('downloadWord').style.display = 'block'; // Показываем кнопку скачивания Word
-            document.getElementById('groupData').style.display = 'block'; // Показываем кнопку группировки
-
-            // Добавляем обработчик для перехода по пустым ячейкам
-            enableEnterToNextCell();
-        }
-    };
-</script>
-
+    </script>
 </body>
 </html>
