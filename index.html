@@ -2,851 +2,829 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Эволюция: Борьба за Существование</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Эволюция: Путь от Обезьяны к Человеку</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            touch-action: manipulation;
         }
         
         body {
-            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(to bottom, #1a2a6c, #b21f1f, #fdbb2d);
             color: white;
             overflow: hidden;
-            padding: 20px;
+            height: 100vh;
+            user-select: none;
         }
         
         #game-container {
-            width: 100%;
-            max-width: 900px;
-            background: rgba(0, 0, 30, 0.8);
-            border-radius: 20px;
-            padding: 20px;
-            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
             position: relative;
+            width: 100%;
+            height: 100vh;
             overflow: hidden;
         }
         
-        #game-header {
-            text-align: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+        #game-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
         }
         
-        #game-title {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            text-shadow: 0 0 10px #ff8800;
-            color: #ffaa44;
+        #ui-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            pointer-events: none;
         }
         
-        #game-stats {
-            display: flex;
-            justify-content: space-around;
-            background: rgba(0, 0, 40, 0.6);
-            padding: 10px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-        
-        .stat {
-            text-align: center;
-            min-width: 120px;
-            margin: 5px;
-        }
-        
-        .stat-value {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #4caf50;
-        }
-        
-        #game-content {
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             display: flex;
             flex-direction: column;
-            gap: 20px;
-        }
-        
-        #evolution-area {
-            position: relative;
-            background: linear-gradient(160deg, #004d40, #00251a);
-            border-radius: 10px;
-            border: 3px solid #00bcd4;
-            height: 300px;
-            overflow: hidden;
-            cursor: pointer;
-        }
-        
-        #organism {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            transition: all 0.5s;
-        }
-        
-        .resource {
-            position: absolute;
-            border-radius: 50%;
-            opacity: 0.8;
-        }
-        
-        #upgrades {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-        }
-        
-        .upgrade {
-            background: rgba(30, 30, 70, 0.7);
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-            transition: all 0.3s;
-            border: 2px solid #3f51b5;
-        }
-        
-        .upgrade:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(63, 81, 181, 0.4);
-            background: rgba(40, 40, 90, 0.8);
-        }
-        
-        .upgrade h3 {
-            color: #ff9800;
-            margin-bottom: 10px;
-        }
-        
-        .upgrade p {
-            font-size: 0.9rem;
-            margin-bottom: 10px;
-            color: #bdbdbd;
-        }
-        
-        .upgrade button {
-            background: #ff5722;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background 0.3s;
-        }
-        
-        .upgrade button:hover {
-            background: #ff7043;
-        }
-        
-        .upgrade button:disabled {
-            background: #7f5b46;
-            cursor: not-allowed;
-        }
-        
-        #environment {
-            background: rgba(0, 50, 70, 0.6);
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-        }
-        
-        #environment-controls {
-            display: flex;
             justify-content: center;
-            gap: 20px;
-            margin-top: 10px;
-            flex-wrap: wrap;
-        }
-        
-        #environment-controls button {
-            background: #009688;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        #environment-controls button.active {
-            background: #00bcd4;
-            box-shadow: 0 0 10px rgba(0, 188, 212, 0.8);
-        }
-        
-        #logs {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 15px;
-            border-radius: 10px;
-            height: 120px;
-            overflow-y: auto;
-            font-size: 0.9rem;
-        }
-        
-        .log-entry {
-            margin-bottom: 5px;
-            padding: 5px;
-            border-left: 3px solid #ffeb3b;
-            padding-left: 10px;
-        }
-        
-        #start-screen, #evolution-screen {
-            text-align: center;
-            padding: 30px;
-        }
-        
-        #start-screen h2 {
-            font-size: 2rem;
-            margin-bottom: 20px;
-            color: #ff9800;
-        }
-        
-        #start-screen p {
-            margin-bottom: 30px;
-            line-height: 1.6;
-        }
-        
-        #start-button {
-            background: #e91e63;
-            color: white;
-            border: none;
-            padding: 15px 40px;
-            font-size: 1.2rem;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        #start-button:hover {
-            background: #f48fb1;
-            transform: scale(1.05);
+            align-items: center;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 3;
+            transition: opacity 0.5s;
         }
         
         .hidden {
             display: none !important;
         }
         
-        .progress-bar {
-            height: 10px;
-            background: #37474f;
-            border-radius: 5px;
-            margin-top: 5px;
-            overflow: hidden;
+        h1 {
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
         }
         
-        .progress-fill {
+        button {
+            background: linear-gradient(to bottom, #ff7e5f, #feb47b);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            margin: 10px;
+            cursor: pointer;
+            pointer-events: auto;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+        
+        button:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        #stats {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 10px;
+            pointer-events: none;
+            z-index: 4;
+        }
+        
+        #controls {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            padding: 0 20px;
+            pointer-events: none;
+            z-index: 4;
+        }
+        
+        .control-btn {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            pointer-events: auto;
+        }
+        
+        #joystick-area {
+            position: absolute;
+            bottom: 30px;
+            left: 30px;
+            width: 120px;
+            height: 120px;
+            pointer-events: auto;
+            z-index: 4;
+        }
+        
+        #joystick {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            touch-action: none;
+        }
+        
+        #evolution-bar-container {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            height: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            z-index: 4;
+            pointer-events: none;
+        }
+        
+        #evolution-bar {
             height: 100%;
-            background: #00bcd4;
-            border-radius: 5px;
             width: 0%;
+            background: linear-gradient(to right, #4caf50, #8bc34a);
+            border-radius: 10px;
             transition: width 0.5s;
         }
         
-        .stage-info {
-            margin-top: 10px;
-            font-style: italic;
-            color: #80cbc4;
+        #stage-indicator {
+            position: absolute;
+            top: 35px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1rem;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            z-index: 4;
+            pointer-events: none;
+        }
+        
+        .creature {
+            position: absolute;
+            transition: transform 0.2s;
+        }
+        
+        .food {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #8bc34a;
+            border-radius: 50%;
         }
         
         .evolution-notification {
             position: absolute;
-            top: 20px;
+            top: 30%;
             left: 50%;
             transform: translateX(-50%);
             background: rgba(0, 0, 0, 0.7);
-            padding: 10px 20px;
+            padding: 15px;
             border-radius: 10px;
-            color: #ffeb3b;
-            font-weight: bold;
-            z-index: 100;
+            text-align: center;
             animation: fadeOut 3s forwards;
+            z-index: 5;
         }
         
         @keyframes fadeOut {
-            0% { opacity: 1; top: 20px; }
-            70% { opacity: 1; top: 20px; }
-            100% { opacity: 0; top: -50px; }
-        }
-        
-        @media (max-width: 768px) {
-            #game-stats {
-                flex-wrap: wrap;
-            }
-            
-            .stat {
-                flex: 1 0 50%;
-                margin-bottom: 10px;
-            }
-            
-            #upgrades {
-                grid-template-columns: 1fr;
-            }
-            
-            #environment-controls {
-                gap: 10px;
-            }
-            
-            #environment-controls button {
-                padding: 6px 10px;
-                font-size: 0.9rem;
-            }
+            0% { opacity: 1; }
+            70% { opacity: 1; }
+            100% { opacity: 0; display: none; }
         }
     </style>
 </head>
 <body>
     <div id="game-container">
-        <div id="start-screen">
-            <h2>Эволюция: Борьба за Существование</h2>
-            <p>Вы - простейший организм в бескрайнем океане. Развивайтесь, потребляя ресурсы, приобретайте новые способности и приспосабливайтесь к изменяющейся среде. Ваша цель - пройти путь от микроскопической клетки до сложного многоклеточного организма и далее до разумного существа!</p>
-            <button id="start-button">Начать Эволюцию</button>
-        </div>
+        <canvas id="game-canvas"></canvas>
         
-        <div id="game-screen" class="hidden">
-            <div id="game-header">
-                <h1 id="game-title">Эволюция: Борьба за Существование</h1>
-                <div id="game-stats">
-                    <div class="stat">
-                        <div>Энергия</div>
-                        <div class="stat-value" id="energy">100</div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" id="energy-bar"></div>
-                        </div>
-                    </div>
-                    <div class="stat">
-                        <div>Стадия</div>
-                        <div class="stat-value" id="stage">1</div>
-                        <div id="stage-name">Простая клетка</div>
-                    </div>
-                    <div class="stat">
-                        <div>ДНК</div>
-                        <div class="stat-value" id="dna">0</div>
-                        <div>Эволюционные очки</div>
-                    </div>
-                    <div class="stat">
-                        <div>Время</div>
-                        <div class="stat-value" id="time">0</div>
-                        <div>Поколения</div>
-                    </div>
-                </div>
+        <div id="ui-overlay">
+            <div id="stats">
+                <div>Энергия: <span id="energy-value">100</span></div>
+                <div>Собрано еды: <span id="food-count">0</span></div>
             </div>
             
-            <div id="game-content">
-                <div id="evolution-area">
-                    <div id="organism"></div>
-                    <!-- Resources will be generated here -->
-                </div>
-                
-                <div id="environment">
-                    <h3>Окружающая среда: <span id="environment-name">Нормальная</span></h3>
-                    <div id="environment-controls">
-                        <button id="btn-day" class="active">День</button>
-                        <button id="btn-night">Ночь</button>
-                        <button id="btn-cold">Холод</button>
-                        <button id="btn-warm">Тепло</button>
-                        <button id="btn-acid">Кислотная</button>
-                    </div>
-                </div>
-                
-                <div id="upgrades">
-                    <div class="upgrade">
-                        <h3>Фотосинтез</h3>
-                        <p>Позволяет получать энергию от солнца</p>
-                        <div>Стоимость: 10 ДНК</div>
-                        <button id="btn-photosynthesis" onclick="buyUpgrade('photosynthesis')">Приобрести</button>
-                    </div>
-                    <div class="upgrade">
-                        <h3>Хищничество</h3>
-                        <p>Позволяет потреблять другие клетки</p>
-                        <div>Стоимость: 20 ДНК</div>
-                        <button id="btn-predation" onclick="buyUpgrade('predation')">Приобрести</button>
-                    </div>
-                    <div class="upgrade">
-                        <h3>Движение</h3>
-                        <p>Позволяет主动移动寻找资源</p>
-                        <div>Стоимость: 15 ДНК</div>
-                        <button id="btn-movement" onclick="buyUpgrade('movement')">Приобрести</button>
-                    </div>
-                    <div class="upgrade">
-                        <h3>Защитная мембрана</h3>
-                        <p>Увеличивает выживаемость</p>
-                        <div>Стоимость: 25 ДНК</div>
-                        <button id="btn-membrane" onclick="buyUpgrade('membrane')">Приобрести</button>
-                    </div>
-                </div>
-                
-                <div id="logs">
-                    <h3>Журнал эволюции</h3>
-                    <div class="log-entry">Добро пожаловать в игру! Вы - простейший организм.</div>
-                </div>
+            <div id="evolution-bar-container">
+                <div id="evolution-bar"></div>
             </div>
+            <div id="stage-indicator">Обезьяна</div>
+            
+            <div id="controls">
+                <div class="control-btn" id="action-btn">⚡</div>
+                <div class="control-btn" id="special-btn">🌟</div>
+            </div>
+            
+            <div id="joystick-area">
+                <div id="joystick"></div>
+            </div>
+        </div>
+        
+        <div id="start-screen" class="screen">
+            <h1>Эволюция: Путь от Обезьяны к Человеку</h1>
+            <p>Собирайте еду, избегайте хищников и развивайтесь!</p>
+            <button id="start-button">Начать игру</button>
+        </div>
+        
+        <div id="evolution-screen" class="screen hidden">
+            <h1>Новая стадия эволюции!</h1>
+            <div id="evolution-stage"></div>
+            <button id="continue-button">Продолжить</button>
+        </div>
+        
+        <div id="game-over-screen" class="screen hidden">
+            <h1>Игра окончена</h1>
+            <p>Вы достигли: <span id="final-stage">Обезьяна</span></p>
+            <button id="restart-button">Играть снова</button>
         </div>
     </div>
 
     <script>
-        // Игровые переменные
-        let gameState = {
+        // Основные переменные игры
+        let canvas, ctx;
+        let gameActive = false;
+        let player = {
+            x: 0,
+            y: 0,
+            speed: 3,
+            size: 30,
             energy: 100,
-            maxEnergy: 100,
-            stage: 1,
-            dna: 0,
-            time: 0,
-            upgrades: {
-                photosynthesis: false,
-                predation: false,
-                movement: false,
-                membrane: false,
-                reproduction: false,
-                nervousSystem: false,
-                intelligence: false
-            },
-            environment: 'day',
-            gameActive: false,
-            stageNames: {
-                1: "Простая клетка",
-                2: "Многоклеточный организм",
-                3: "Членистоногое",
-                4: "Рыба",
-                5: "Земноводное",
-                6: "Пресмыкающееся",
-                7: "Млекопитающее",
-                8: "Примат",
-                9: "Гоминид",
-                10: "Человек разумный"
-            }
+            foodCollected: 0,
+            evolutionProgress: 0,
+            stage: 0,
+            stageNames: ['Обезьяна', 'Гоминид', 'Человек умелый', 'Человек прямоходящий', 'Человек разумный'],
+            color: '#8b4513'
         };
         
-        // Элементы DOM
-        const startScreen = document.getElementById('start-screen');
-        const gameScreen = document.getElementById('game-screen');
-        const energyElement = document.getElementById('energy');
-        const energyBar = document.getElementById('energy-bar');
-        const stageElement = document.getElementById('stage');
-        const stageNameElement = document.getElementById('stage-name');
-        const dnaElement = document.getElementById('dna');
-        const timeElement = document.getElementById('time');
-        const logsContainer = document.getElementById('logs');
-        const organismElement = document.getElementById('organism');
-        const evolutionArea = document.getElementById('evolution-area');
-        const environmentNameElement = document.getElementById('environment-name');
+        let creatures = [];
+        let foods = [];
+        let joystick = { x: 0, y: 0, active: false };
+        let touchId = null;
         
-        // Начало игры
-        document.getElementById('start-button').addEventListener('click', startGame);
-        
-        // Кнопки среды
-        document.getElementById('btn-day').addEventListener('click', () => changeEnvironment('day'));
-        document.getElementById('btn-night').addEventListener('click', () => changeEnvironment('night'));
-        document.getElementById('btn-cold').addEventListener('click', () => changeEnvironment('cold'));
-        document.getElementById('btn-warm').addEventListener('click', () => changeEnvironment('warm'));
-        document.getElementById('btn-acid').addEventListener('click', () => changeEnvironment('acid'));
-        
-        // Инициализация организма и ресурсов
-        function initGameWorld() {
-            // Очистка ресурсов
-            document.querySelectorAll('.resource').forEach(res => res.remove());
+        // Инициализация игры
+        function init() {
+            canvas = document.getElementById('game-canvas');
+            ctx = canvas.getContext('2d');
+            resizeCanvas();
             
-            // Создаем организм в зависимости от стадии
-            updateOrganism();
+            // Слушатели событий
+            window.addEventListener('resize', resizeCanvas);
+            document.getElementById('start-button').addEventListener('click', startGame);
+            document.getElementById('restart-button').addEventListener('click', startGame);
+            document.getElementById('continue-button').addEventListener('click', continueGame);
             
-            // Создаем ресурсы
-            createResources();
-        }
-        
-        // Обновление внешнего вида организма
-        function updateOrganism() {
-            let organismHTML = '';
-            const size = 50 + gameState.stage * 10;
+            // Настройка джойстика
+            const joystickArea = document.getElementById('joystick-area');
+            const joystickElement = document.getElementById('joystick');
             
-            organismElement.style.width = `${size}px`;
-            organismElement.style.height = `${size}px`;
-            
-            // Внешний вид зависит от стадии и улучшений
-            if (gameState.stage === 1) {
-                organismHTML = `<div style="width:100%; height:100%; border-radius:50%; background:radial-gradient(circle at 30% 30%, #03a9f4, #0288d1); border:2px solid #01579b;"></div>`;
-            } else if (gameState.stage === 2) {
-                organismHTML = `<div style="width:100%; height:100%; border-radius:50%; background:radial-gradient(circle at 30% 30%, #4caf50, #2e7d32); border:2px solid #1b5e20; display:flex; flex-wrap:wrap; justify-content:center; align-items:center;">
-                    <div style="width:40%; height:40%; background:#388e3c; border-radius:50%; margin:2px;"></div>
-                    <div style="width:40%; height:40%; background:#388e3c; border-radius:50%; margin:2px;"></div>
-                    <div style="width:40%; height:40%; background:#388e3c; border-radius:50%; margin:2px;"></div>
-                    <div style="width:40%; height:40%; background:#388e3c; border-radius:50%; margin:2px;"></div>
-                </div>`;
-            } else if (gameState.stage === 3) {
-                organismHTML = `<div style="width:100%; height:100%; background:#795548; border-radius:20%; position:relative;">
-                    <div style="position:absolute; width:20%; height:30%; background:#5d4037; top:-10%; left:20%; border-radius:50%;"></div>
-                    <div style="position:absolute; width:20%; height:30%; background:#5d4037; top:-10%; left:60%; border-radius:50%;"></div>
-                    <div style="position:absolute; width:80%; height:20%; background:#6d4c41; bottom:10%; left:10%; border-radius:10px;"></div>
-                </div>`;
-            } else if (gameState.stage >= 4 && gameState.stage < 7) {
-                organismHTML = `<div style="width:100%; height:100%; background:linear-gradient(45deg, #78909c, #546e7a); border-radius:40% 40% 0 0; position:relative;">
-                    <div style="position:absolute; width:15%; height:20%; background:#607d8b; top:10%; left:20%; border-radius:50%;"></div>
-                    <div style="position:absolute; width:15%; height:20%; background:#607d8b; top:10%; left:65%; border-radius:50%;"></div>
-                    <div style="position:absolute; width:60%; height:10%; background:#90a4ae; bottom:15%; left:20%; border-radius:10px;"></div>
-                </div>`;
-            } else if (gameState.stage >= 7) {
-                organismHTML = `<div style="width:100%; height:100%; background:linear-gradient(45deg, #ffcc80, #ffb74d); border-radius:50% 50% 0 0; position:relative;">
-                    <div style="position:absolute; width:20%; height:25%; background:#ffa726; top:0; left:40%; border-radius:50%;"></div>
-                    <div style="position:absolute; width:10%; height:15%; background:#fff; top:15%; left:30%; border-radius:50%;"></div>
-                    <div style="position:absolute; width:10%; height:15%; background:#fff; top:15%; left:60%; border-radius:50%;"></div>
-                    <div style="position:absolute; width:5%; height:7%; background:#000; top:18%; left:33%; border-radius:50%;"></div>
-                    <div style="position:absolute; width:5%; height:7%; background:#000; top:18%; left:63%; border-radius:50%;"></div>
-                    <div style="position:absolute; width:40%; height:20%; background:#ffb74d; bottom:0; left:30%; border-radius:10px 10px 0 0;"></div>
-                </div>`;
-            }
-            
-            organismElement.innerHTML = organismHTML;
-            
-            // Добавляем эффекты улучшений
-            if (gameState.upgrades.movement) {
-                organismElement.style.animation = "pulse 1s infinite alternate";
-            }
-            
-            if (gameState.upgrades.membrane) {
-                organismElement.style.boxShadow = "0 0 15px #ffeb3b";
-            }
-        }
-        
-        // Создание ресурсов
-        function createResources() {
-            // Создаем ресурсы в виде маленьких кружков
-            for (let i = 0; i < 15; i++) {
-                const resource = document.createElement('div');
-                resource.className = 'resource';
+            joystickArea.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                if (!gameActive) return;
                 
-                const size = 5 + Math.random() * 10;
-                const x = 20 + Math.random() * (evolutionArea.offsetWidth - 40);
-                const y = 20 + Math.random() * (evolutionArea.offsetHeight - 40);
+                const touch = e.touches[0];
+                touchId = touch.identifier;
+                joystick.active = true;
+                updateJoystickPosition(touch.clientX, touch.clientY);
+            });
+            
+            joystickArea.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                if (!gameActive || !joystick.active) return;
                 
-                resource.style.width = `${size}px`;
-                resource.style.height = `${size}px`;
-                resource.style.left = `${x}px`;
-                resource.style.top = `${y}px`;
-                
-                // Разные типы ресурсов
-                if (i % 3 === 0) {
-                    resource.style.background = '#ff9800'; // Органическая материя
-                } else if (i % 3 === 1) {
-                    resource.style.background = '#00bcd4'; // Минералы
-                } else {
-                    resource.style.background = '#8bc34a'; // Солнечная энергия
+                for (let i = 0; i < e.changedTouches.length; i++) {
+                    if (e.changedTouches[i].identifier === touchId) {
+                        updateJoystickPosition(e.changedTouches[i].clientX, e.changedTouches[i].clientY);
+                        break;
+                    }
                 }
+            });
+            
+            joystickArea.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                if (!gameActive) return;
                 
-                evolutionArea.appendChild(resource);
-            }
+                for (let i = 0; i < e.changedTouches.length; i++) {
+                    if (e.changedTouches[i].identifier === touchId) {
+                        resetJoystick();
+                        break;
+                    }
+                }
+            });
+            
+            // Кнопки действий
+            document.getElementById('action-btn').addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                if (!gameActive) return;
+                // Действие при нажатии (например, атака или ускорение)
+                if (player.energy > 10) {
+                    player.speed = 6;
+                    player.energy -= 1;
+                    setTimeout(() => { player.speed = 3; }, 1000);
+                }
+            });
+            
+            document.getElementById('special-btn').addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                if (!gameActive) return;
+                // Специальное действие в зависимости от стадии
+                if (player.stage >= 2 && player.energy > 30) {
+                    player.energy -= 30;
+                    // Использовать инструменты или особую способность
+                    showNotification("Использована специальная способность!");
+                }
+            });
+            
+            // Генерация начального содержимого
+            generateInitialFood();
+            generateInitialCreatures();
+            
+            // Запуск цикла отрисовки
+            requestAnimationFrame(gameLoop);
         }
         
-        // Начать игру
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            // Перемещаем игрока в центр при изменении размера
+            player.x = canvas.width / 2;
+            player.y = canvas.height / 2;
+        }
+        
         function startGame() {
-            startScreen.classList.add('hidden');
-            gameScreen.classList.remove('hidden');
-            gameState.gameActive = true;
-            
-            // Инициализация игрового мира
-            initGameWorld();
-            
-            // Запуск игрового цикла
-            gameLoop();
-            
-            // Добавляем сообщение в журнал
-            addLog("Вы начали свою эволюцию как простая клетка.");
-        }
-        
-        // Игровой цикл
-        function gameLoop() {
-            if (!gameState.gameActive) return;
-            
-            // Увеличиваем время
-            gameState.time++;
-            timeElement.textContent = gameState.time;
-            
-            // Уменьшаем энергию со временем
-            gameState.energy -= 0.5;
-            
-            // Влияние среды на энергию
-            if (gameState.environment === 'cold') {
-                gameState.energy -= 0.3;
-            } else if (gameState.environment === 'acid') {
-                gameState.energy -= 0.8;
-            }
-            
-            // Если есть фотосинтез и день, получаем энергию
-            if (gameState.upgrades.photosynthesis && gameState.environment === 'day') {
-                gameState.energy += 0.8;
-                if (gameState.time % 50 === 0) {
-                    addLog("Фотосинтез дает вам энергию.");
-                }
-            }
-            
-            // Если есть хищничество, получаем энергию от ресурсов
-            if (gameState.upgrades.predation && gameState.time % 30 === 0) {
-                gameState.energy += 2;
-                if (gameState.time % 60 === 0) {
-                    addLog("Хищничество приносит дополнительную энергию.");
-                }
-            }
-            
-            // Ограничиваем энергию максимумом
-            if (gameState.energy > gameState.maxEnergy) {
-                gameState.energy = gameState.maxEnergy;
-            }
-            
-            // Проверяем смерть от недостатка энергии
-            if (gameState.energy <= 0) {
-                gameOver();
-                return;
-            }
-            
-            // Обновляем отображение энергии
-            updateEnergyDisplay();
-            
-            // Шанс получить ДНК
-            if (Math.random() < 0.02) {
-                gameState.dna++;
-                dnaElement.textContent = gameState.dna;
-                if (gameState.dna % 5 === 0) {
-                    addLog("Мутация! Получено ДНК.");
-                }
-            }
-            
-            // Проверяем эволюцию на следующую стадию
-            checkEvolution();
-            
-            // Обновляем доступность улучшений
-            updateUpgradesAvailability();
-            
-            // Продолжаем цикл
-            setTimeout(gameLoop, 100);
-        }
-        
-        // Обновление отображения энергии
-        function updateEnergyDisplay() {
-            energyElement.textContent = Math.floor(gameState.energy);
-            const energyPercent = (gameState.energy / gameState.maxEnergy) * 100;
-            energyBar.style.width = energyPercent + '%';
-            
-            // Меняем цвет в зависимости от уровня энергии
-            if (energyPercent > 50) {
-                energyBar.style.background = '#4caf50';
-            } else if (energyPercent > 25) {
-                energyBar.style.background = '#ff9800';
-            } else {
-                energyBar.style.background = '#f44336';
-            }
-        }
-        
-        // Покупка улучшения
-        function buyUpgrade(upgradeName) {
-            const cost = getUpgradeCost(upgradeName);
-            
-            if (gameState.dna >= cost && !gameState.upgrades[upgradeName]) {
-                gameState.dna -= cost;
-                gameState.upgrades[upgradeName] = true;
-                dnaElement.textContent = gameState.dna;
-                
-                // Эффекты в зависимости от улучшения
-                switch(upgradeName) {
-                    case 'photosynthesis':
-                        addLog("Вы развили способность к фотосинтезу!");
-                        break;
-                    case 'predation':
-                        addLog("Вы развили способность потреблять другие клетки!");
-                        break;
-                    case 'movement':
-                        addLog("Вы развили способность к движению!");
-                        break;
-                    case 'membrane':
-                        addLog("Вы развили защитную мембрану!");
-                        break;
-                }
-                
-                // Обновляем организм
-                updateOrganism();
-            }
-        }
-        
-        // Получить стоимость улучшения
-        function getUpgradeCost(upgradeName) {
-            const costs = {
-                photosynthesis: 10,
-                predation: 20,
-                movement: 15,
-                membrane: 25,
-                reproduction: 40,
-                nervousSystem: 60,
-                intelligence: 100
+            // Сброс состояния игры
+            player = {
+                x: canvas.width / 2,
+                y: canvas.height / 2,
+                speed: 3,
+                size: 30,
+                energy: 100,
+                foodCollected: 0,
+                evolutionProgress: 0,
+                stage: 0,
+                stageNames: ['Обезьяна', 'Гоминид', 'Человек умелый', 'Человек прямоходящий', 'Человек разумный'],
+                color: '#8b4513'
             };
             
-            return costs[upgradeName] || 0;
-        }
-        
-        // Обновление доступности улучшений
-        function updateUpgradesAvailability() {
-            document.getElementById('btn-photosynthesis').disabled = gameState.upgrades.photosynthesis || gameState.dna < 10;
-            document.getElementById('btn-predation').disabled = gameState.upgrades.predation || gameState.dna < 20;
-            document.getElementById('btn-movement').disabled = gameState.upgrades.movement || gameState.dna < 15;
-            document.getElementById('btn-membrane').disabled = gameState.upgrades.membrane || gameState.dna < 25;
-        }
-        
-        // Изменение окружающей среды
-        function changeEnvironment(env) {
-            gameState.environment = env;
+            creatures = [];
+            foods = [];
             
-            // Обновляем активную кнопку
-            document.querySelectorAll('#environment-controls button').forEach(btn => {
-                btn.classList.remove('active');
+            generateInitialFood();
+            generateInitialCreatures();
+            
+            // Обновление интерфейса
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('game-over-screen').classList.add('hidden');
+            document.getElementById('evolution-screen').classList.add('hidden');
+            
+            updateStats();
+            updateEvolutionBar();
+            
+            gameActive = true;
+        }
+        
+        function continueGame() {
+            document.getElementById('evolution-screen').classList.add('hidden');
+            gameActive = true;
+        }
+        
+        function gameOver() {
+            gameActive = false;
+            document.getElementById('final-stage').textContent = player.stageNames[player.stage];
+            document.getElementById('game-over-screen').classList.remove('hidden');
+        }
+        
+        function gameLoop() {
+            if (gameActive) {
+                update();
+                render();
+            }
+            requestAnimationFrame(gameLoop);
+        }
+        
+        function update() {
+            // Перемещение игрока
+            if (joystick.active) {
+                player.x += joystick.x * player.speed;
+                player.y += joystick.y * player.speed;
+                
+                // Ограничение в пределах canvas
+                player.x = Math.max(player.size, Math.min(canvas.width - player.size, player.x));
+                player.y = Math.max(player.size, Math.min(canvas.height - player.size, player.y));
+            }
+            
+            // Постепенное уменьшение энергии
+            player.energy -= 0.05;
+            
+            // Проверка съеденной еды
+            checkFoodCollision();
+            
+            // Проверка столкновений с существами
+            checkCreatureCollisions();
+            
+            // Обновление существ
+            updateCreatures();
+            
+            // Добавление новой еды, если нужно
+            if (foods.length < 20) {
+                generateFood();
+            }
+            
+            // Проверка условий эволюции
+            checkEvolution();
+            
+            // Проверка завершения игры
+            if (player.energy <= 0) {
+                gameOver();
+            }
+            
+            // Обновление интерфейса
+            updateStats();
+        }
+        
+        function render() {
+            // Очистка canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Отрисовка фона
+            drawBackground();
+            
+            // Отрисовка еды
+            drawFood();
+            
+            // Отрисовка существ
+            drawCreatures();
+            
+            // Отрисовка игрока
+            drawPlayer();
+        }
+        
+        function drawBackground() {
+            // Простой градиентный фон
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            gradient.addColorStop(0, "#1a2a6c");
+            gradient.addColorStop(0.5, "#b21f1f");
+            gradient.addColorStop(1, "#fdbb2d");
+            
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Рисуем землю
+            ctx.fillStyle = '#8B4513';
+            ctx.fillRect(0, canvas.height * 0.7, canvas.width, canvas.height * 0.3);
+            
+            // Рисуем несколько простых деревьев
+            ctx.fillStyle = '#5d4037';
+            for (let i = 0; i < 5; i++) {
+                const x = (i * canvas.width / 5) + (Math.random() * 50);
+                ctx.fillRect(x, canvas.height * 0.6, 15, canvas.height * 0.2);
+                
+                ctx.fillStyle = '#2e7d32';
+                ctx.beginPath();
+                ctx.arc(x + 7, canvas.height * 0.55, 30, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = '#5d4037';
+            }
+        }
+        
+        function drawPlayer() {
+            ctx.fillStyle = player.color;
+            ctx.beginPath();
+            ctx.arc(player.x, player.y, player.size, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Глаза
+            ctx.fillStyle = 'white';
+            ctx.beginPath();
+            ctx.arc(player.x - 10, player.y - 5, 5, 0, Math.PI * 2);
+            ctx.arc(player.x + 10, player.y - 5, 5, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.fillStyle = 'black';
+            ctx.beginPath();
+            ctx.arc(player.x - 10, player.y - 5, 2, 0, Math.PI * 2);
+            ctx.arc(player.x + 10, player.y - 5, 2, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Рот (меняется в зависимости от стадии)
+            ctx.beginPath();
+            if (player.stage < 2) {
+                // Обезьяна/гоминид
+                ctx.arc(player.x, player.y + 5, 7, 0, Math.PI);
+            } else {
+                // Более развитые стадии
+                ctx.arc(player.x, player.y + 8, 5, 0, Math.PI, true);
+            }
+            ctx.stroke();
+            
+            // Особенности в зависимости от стадии эволюции
+            if (player.stage >= 2) {
+                // Инструменты для более развитых стадий
+                ctx.fillStyle = '#795548';
+                ctx.fillRect(player.x + player.size - 5, player.y - 15, 15, 5);
+            }
+            
+            if (player.stage >= 3) {
+                // Более прямая осанка
+                ctx.fillStyle = player.color;
+                ctx.fillRect(player.x - 10, player.y - player.size - 5, 20, 10);
+            }
+        }
+        
+        function drawFood() {
+            for (const food of foods) {
+                ctx.fillStyle = food.color;
+                ctx.beginPath();
+                ctx.arc(food.x, food.y, food.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+        
+        function drawCreatures() {
+            for (const creature of creatures) {
+                ctx.fillStyle = creature.color;
+                ctx.beginPath();
+                ctx.arc(creature.x, creature.y, creature.size, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Глаза для хищников
+                if (creature.type === 'predator') {
+                    ctx.fillStyle = 'white';
+                    ctx.beginPath();
+                    ctx.arc(creature.x - 5, creature.y - 3, 3, 0, Math.PI * 2);
+                    ctx.arc(creature.x + 5, creature.y - 3, 3, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    ctx.fillStyle = 'red';
+                    ctx.beginPath();
+                    ctx.arc(creature.x - 5, creature.y - 3, 1.5, 0, Math.PI * 2);
+                    ctx.arc(creature.x + 5, creature.y - 3, 1.5, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+        }
+        
+        function updateJoystickPosition(x, y) {
+            const joystickArea = document.getElementById('joystick-area');
+            const joystickElement = document.getElementById('joystick');
+            
+            const areaRect = joystickArea.getBoundingClientRect();
+            const areaCenterX = areaRect.left + areaRect.width / 2;
+            const areaCenterY = areaRect.top + areaRect.height / 2;
+            
+            let dx = x - areaCenterX;
+            let dy = y - areaCenterY;
+            
+            // Ограничение радиуса джойстика
+            const distance = Math.min(Math.sqrt(dx * dx + dy * dy), areaRect.width / 2);
+            const angle = Math.atan2(dy, dx);
+            
+            dx = Math.cos(angle) * distance;
+            dy = Math.sin(angle) * distance;
+            
+            // Обновление позиции джойстика на экране
+            joystickElement.style.left = `${areaRect.width / 2 + dx}px`;
+            joystickElement.style.top = `${areaRect.height / 2 + dy}px`;
+            
+            // Нормализованные значения для движения
+            joystick.x = dx / (areaRect.width / 2);
+            joystick.y = dy / (areaRect.height / 2);
+        }
+        
+        function resetJoystick() {
+            const joystickElement = document.getElementById('joystick');
+            joystickElement.style.left = '50%';
+            joystickElement.style.top = '50%';
+            
+            joystick.x = 0;
+            joystick.y = 0;
+            joystick.active = false;
+            touchId = null;
+        }
+        
+        function generateInitialFood() {
+            for (let i = 0; i < 15; i++) {
+                generateFood();
+            }
+        }
+        
+        function generateFood() {
+            const size = 5 + Math.random() * 5;
+            const x = Math.random() * canvas.width;
+            const y = canvas.height * 0.7 + Math.random() * (canvas.height * 0.3 - size);
+            
+            // Разные типы еды с разной питательной ценностью
+            const types = [
+                { color: '#8bc34a', energy: 10 },
+                { color: '#ffeb3b', energy: 15 },
+                { color: '#ff9800', energy: 20 }
+            ];
+            
+            const type = types[Math.floor(Math.random() * types.length)];
+            
+            foods.push({
+                x, y, size,
+                color: type.color,
+                energy: type.energy
             });
-            document.getElementById(`btn-${env}`).classList.add('active');
+        }
+        
+        function generateInitialCreatures() {
+            // Создаем несколько существ разных типов
+            for (let i = 0; i < 5; i++) {
+                generateCreature('prey');
+            }
             
-            // Меняем фон в зависимости от среды
-            switch(env) {
-                case 'day':
-                    evolutionArea.style.background = 'linear-gradient(160deg, #004d40, #00251a)';
-                    environmentNameElement.textContent = 'День';
-                    addLog("Наступил день. Светло и тепло.");
-                    break;
-                case 'night':
-                    evolutionArea.style.background = 'linear-gradient(160deg, #0d1b1a, #00100c)';
-                    environmentNameElement.textContent = 'Ночь';
-                    addLog("Наступила ночь. Темно и прохладно.");
-                    break;
-                case 'cold':
-                    evolutionArea.style.background = 'linear-gradient(160deg, #1e3a5f, #0c1a33)';
-                    environmentNameElement.textContent = 'Холод';
-                    addLog("Стало холодно. Энергия тратится быстрее.");
-                    break;
-                case 'warm':
-                    evolutionArea.style.background = 'linear-gradient(160deg, #5d4037, #3e2723)';
-                    environmentNameElement.textContent = 'Тепло';
-                    addLog("Стало тепло. Условия благоприятные.");
-                    break;
-                case 'acid':
-                    evolutionArea.style.background = 'linear-gradient(160deg, #33691e, #1b5e20)';
-                    environmentNameElement.textContent = 'Кислотная';
-                    addLog("Кислотная среда! Опасно для жизни!");
-                    break;
+            for (let i = 0; i < 2; i++) {
+                generateCreature('predator');
             }
         }
         
-        // Проверка эволюции на следующую стадию
+        function generateCreature(type) {
+            const size = type === 'predator' ? 25 : 15;
+            const x = Math.random() * canvas.width;
+            const y = canvas.height * 0.7 + Math.random() * (canvas.height * 0.3 - size);
+            
+            creatures.push({
+                x, y, size, type,
+                color: type === 'predator' ? '#f44336' : '#2196f3',
+                speed: type === 'predator' ? 1.5 : 1,
+                direction: Math.random() * Math.PI * 2,
+                directionChangeTime: 0
+            });
+        }
+        
+        function updateCreatures() {
+            for (const creature of creatures) {
+                // Периодически меняем направление движения
+                creature.directionChangeTime--;
+                if (creature.directionChangeTime <= 0) {
+                    creature.direction = Math.random() * Math.PI * 2;
+                    creature.directionChangeTime = 50 + Math.random() * 100;
+                }
+                
+                // Хищники преследуют игрока
+                if (creature.type === 'predator') {
+                    const dx = player.x - creature.x;
+                    const dy = player.y - creature.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < 200) {
+                        creature.direction = Math.atan2(dy, dx);
+                    }
+                }
+                
+                // Движение существ
+                creature.x += Math.cos(creature.direction) * creature.speed;
+                creature.y += Math.sin(creature.direction) * creature.speed;
+                
+                // Ограничение в пределах игровой области
+                if (creature.x < creature.size) creature.x = creature.size;
+                if (creature.x > canvas.width - creature.size) creature.x = canvas.width - creature.size;
+                if (creature.y < creature.size) creature.y = creature.size;
+                if (creature.y > canvas.height - creature.size) creature.y = canvas.height - creature.size;
+                
+                // Отскакивание от границ
+                if (creature.x <= creature.size || creature.x >= canvas.width - creature.size) {
+                    creature.direction = Math.PI - creature.direction;
+                }
+                if (creature.y <= creature.size || creature.y >= canvas.height - creature.size) {
+                    creature.direction = -creature.direction;
+                }
+            }
+        }
+        
+        function checkFoodCollision() {
+            for (let i = foods.length - 1; i >= 0; i--) {
+                const food = foods[i];
+                const dx = player.x - food.x;
+                const dy = player.y - food.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance < player.size + food.size) {
+                    // Игрок съедает еду
+                    player.energy = Math.min(100, player.energy + food.energy);
+                    player.foodCollected++;
+                    player.evolutionProgress += food.energy;
+                    
+                    foods.splice(i, 1);
+                    generateFood();
+                    
+                    updateStats();
+                    updateEvolutionBar();
+                }
+            }
+        }
+        
+        function checkCreatureCollisions() {
+            for (const creature of creatures) {
+                const dx = player.x - creature.x;
+                const dy = player.y - creature.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance < player.size + creature.size) {
+                    if (creature.type === 'predator') {
+                        // Столкновение с хищником отнимает энергию
+                        player.energy -= 5;
+                        
+                        // Отталкивание от хищника
+                        const angle = Math.atan2(dy, dx);
+                        player.x += Math.cos(angle) * 20;
+                        player.y += Math.sin(angle) * 20;
+                    } else {
+                        // Столкновение с добычей дает немного энергии
+                        player.energy = Math.min(100, player.energy + 5);
+                        
+                        // Удаляем существо-добычу
+                        const index = creatures.indexOf(creature);
+                        if (index > -1) {
+                            creatures.splice(index, 1);
+                            generateCreature('prey');
+                        }
+                    }
+                }
+            }
+        }
+        
         function checkEvolution() {
-            const evolutionThreshold = gameState.stage * 50;
+            const evolutionThresholds = [100, 250, 500, 750, 1000];
             
-            if (gameState.time >= evolutionThreshold && gameState.stage < 10) {
-                gameState.stage++;
-                stageElement.textContent = gameState.stage;
-                stageNameElement.textContent = gameState.stageNames[gameState.stage];
-                
-                // Увеличиваем максимальную энергию
-                gameState.maxEnergy += 50;
-                gameState.energy = gameState.maxEnergy;
-                updateEnergyDisplay();
-                
-                // Показываем уведомление об эволюции
-                showEvolutionNotification(`Вы эволюционировали в ${gameState.stageNames[gameState.stage]}!`);
-                
-                // Добавляем запись в журнал
-                addLog(`Эволюция! Теперь вы ${gameState.stageNames[gameState.stage]}.`);
-                
-                // Обновляем организм
-                updateOrganism();
+            if (player.stage < evolutionThresholds.length && 
+                player.evolutionProgress >= evolutionThresholds[player.stage]) {
+                evolve();
             }
         }
         
-        // Показать уведомление об эволюции
-        function showEvolutionNotification(message) {
+        function evolve() {
+            gameActive = false;
+            player.stage++;
+            
+            // Изменяем характеристики игрока в зависимости от стадии
+            player.size = 30 + player.stage * 5;
+            player.speed = 3 + player.stage * 0.5;
+            
+            // Меняем цвет в зависимости от стадии
+            const colors = ['#8b4513', '#a0522d', '#cd853f', '#d2b48c', '#f5deb3'];
+            player.color = colors[Math.min(player.stage, colors.length - 1)];
+            
+            // Показываем экран эволюции
+            document.getElementById('evolution-stage').textContent = player.stageNames[player.stage];
+            document.getElementById('evolution-screen').classList.remove('hidden');
+            
+            // Обновляем индикатор стадии
+            document.getElementById('stage-indicator').textContent = player.stageNames[player.stage];
+            
+            showNotification(`Вы эволюционировали в ${player.stageNames[player.stage]}!`);
+        }
+        
+        function updateStats() {
+            document.getElementById('energy-value').textContent = Math.floor(player.energy);
+            document.getElementById('food-count').textContent = player.foodCollected;
+        }
+        
+        function updateEvolutionBar() {
+            const evolutionThresholds = [100, 250, 500, 750, 1000];
+            const currentThreshold = player.stage < evolutionThresholds.length ? 
+                evolutionThresholds[player.stage] : evolutionThresholds[evolutionThresholds.length - 1];
+            const prevThreshold = player.stage > 0 ? evolutionThresholds[player.stage - 1] : 0;
+            
+            const progress = player.evolutionProgress - prevThreshold;
+            const maxProgress = currentThreshold - prevThreshold;
+            
+            const percentage = (progress / maxProgress) * 100;
+            document.getElementById('evolution-bar').style.width = `${percentage}%`;
+        }
+        
+        function showNotification(message) {
             const notification = document.createElement('div');
             notification.className = 'evolution-notification';
             notification.textContent = message;
             
             document.getElementById('game-container').appendChild(notification);
             
-            // Удаляем уведомление после анимации
             setTimeout(() => {
                 notification.remove();
             }, 3000);
         }
         
-        // Добавление записи в журнал
-        function addLog(message) {
-            const logEntry = document.createElement('div');
-            logEntry.className = 'log-entry';
-            logEntry.textContent = message;
-            
-            logsContainer.appendChild(logEntry);
-            
-            // Прокручиваем вниз
-            logsContainer.scrollTop = logsContainer.scrollHeight;
-            
-            // Ограничиваем количество записей
-            if (logsContainer.children.length > 10) {
-                logsContainer.removeChild(logsContainer.children[0]);
-            }
-        }
-        
-        // Конец игры
-        function gameOver() {
-            gameState.gameActive = false;
-            addLog("Вы не выжили. Эволюция прекратилась.");
-            addLog(`Итог: вы достигли стадии "${gameState.stageNames[gameState.stage]}" за ${gameState.time} поколений.`);
-            
-            // Показываем кнопку перезапуска
-            const restartButton = document.createElement('button');
-            restartButton.textContent = "Начать заново";
-            restartButton.style.background = '#e91e63';
-            restartButton.style.color = 'white';
-            restartButton.style.border = 'none';
-            restartButton.style.padding = '10px 20px';
-            restartButton.style.borderRadius = '5px';
-            restartButton.style.cursor = 'pointer';
-            restartButton.style.marginTop = '10px';
-            
-            restartButton.addEventListener('click', () => {
-                location.reload();
-            });
-            
-            logsContainer.appendChild(restartButton);
-        }
-        
-        // Обработка кликов по области эволюции для сбора ресурсов
-        evolutionArea.addEventListener('click', (e) => {
-            if (!gameState.gameActive) return;
-            
-            // Проверяем, попал ли клик по ресурсу
-            if (e.target.classList.contains('resource')) {
-                // Удаляем ресурс
-                e.target.remove();
-                
-                // Получаем энергию от ресурса
-                const energyGain = 5 + Math.floor(Math.random() * 10);
-                gameState.energy += energyGain;
-                
-                if (gameState.energy > gameState.maxEnergy) {
-                    gameState.energy = gameState.maxEnergy;
-                }
-                
-                updateEnergyDisplay();
-                addLog(`Вы поглотили ресурс и получили ${energyGain} энергии.`);
-                
-                // Создаем новый ресурс через некоторое время
-                setTimeout(createResources, 1000);
-            }
-        });
-        
-        // Добавляем CSS анимацию
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes pulse {
-                from { transform: translate(-50%, -50%) scale(1); }
-                to { transform: translate(-50%, -50%) scale(1.05); }
-            }
-        `;
-        document.head.appendChild(style);
+        // Запуск игры при загрузке страницы
+        window.onload = init;
     </script>
 </body>
 </html>
