@@ -3,651 +3,850 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Средневековые Шахматы: Рыцарская Битва</title>
+    <title>Эволюция: Борьба за Существование</title>
     <style>
-        body {
-            font-family: 'Times New Roman', serif;
-            background-color: #f0d9b5;
-            color: #5a3921;
+        * {
             margin: 0;
-            padding: 20px;
-            background-image: url('https://images.unsplash.com/photo-1579547945413-497e1b99dac0?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
-            background-size: cover;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background-color: rgba(240, 217, 181, 0.9);
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-            border: 2px solid #5a3921;
-        }
-        
-        h1 {
-            text-align: center;
-            color: #8b4513;
-            text-shadow: 1px 1px 2px #000;
-            font-size: 2.5em;
-            margin-bottom: 10px;
-        }
-        
-        .subtitle {
-            text-align: center;
-            font-style: italic;
-            margin-bottom: 30px;
-        }
-        
-        .chessboard {
-            width: 400px;
-            height: 400px;
-            margin: 20px auto;
-            border: 10px solid #5a3921;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
-        }
-        
-        .row {
-            display: flex;
-            height: 12.5%;
-        }
-        
-        .square {
-            width: 12.5%;
-            height: 100%;
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 30px;
-            cursor: pointer;
+            color: white;
+            overflow: hidden;
+            padding: 20px;
+        }
+        
+        #game-container {
+            width: 100%;
+            max-width: 900px;
+            background: rgba(0, 0, 30, 0.8);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
             position: relative;
+            overflow: hidden;
         }
         
-        .light {
-            background-color: #f0d9b5;
-        }
-        
-        .dark {
-            background-color: #b58863;
-        }
-        
-        .selected {
-            background-color: rgba(0, 100, 0, 0.5);
-        }
-        
-        .possible-move {
-            background-color: rgba(0, 100, 0, 0.3);
-        }
-        
-        .controls {
+        #game-header {
             text-align: center;
-            margin: 20px 0;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
         }
         
-        button {
-            background-color: #8b4513;
+        #game-title {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px #ff8800;
+            color: #ffaa44;
+        }
+        
+        #game-stats {
+            display: flex;
+            justify-content: space-around;
+            background: rgba(0, 0, 40, 0.6);
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .stat {
+            text-align: center;
+            min-width: 120px;
+            margin: 5px;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #4caf50;
+        }
+        
+        #game-content {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        #evolution-area {
+            position: relative;
+            background: linear-gradient(160deg, #004d40, #00251a);
+            border-radius: 10px;
+            border: 3px solid #00bcd4;
+            height: 300px;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        
+        #organism {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.5s;
+        }
+        
+        .resource {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.8;
+        }
+        
+        #upgrades {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .upgrade {
+            background: rgba(30, 30, 70, 0.7);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            transition: all 0.3s;
+            border: 2px solid #3f51b5;
+        }
+        
+        .upgrade:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(63, 81, 181, 0.4);
+            background: rgba(40, 40, 90, 0.8);
+        }
+        
+        .upgrade h3 {
+            color: #ff9800;
+            margin-bottom: 10px;
+        }
+        
+        .upgrade p {
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            color: #bdbdbd;
+        }
+        
+        .upgrade button {
+            background: #ff5722;
             color: white;
             border: none;
-            padding: 10px 20px;
-            margin: 0 10px;
+            padding: 8px 15px;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s;
-        }
-        
-        button:hover {
-            background-color: #5a3921;
-        }
-        
-        .piece-info {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: rgba(245, 222, 179, 0.7);
-            border-radius: 5px;
-            border: 1px solid #5a3921;
-        }
-        
-        .game-settings {
-            margin: 20px 0;
-            padding: 15px;
-            background-color: rgba(245, 222, 179, 0.7);
-            border-radius: 5px;
-            border: 1px solid #5a3921;
-        }
-        
-        select {
-            padding: 8px;
-            border-radius: 5px;
-            border: 1px solid #5a3921;
-            background-color: #f0d9b5;
-            color: #5a3921;
-            font-size: 16px;
-            margin-left: 10px;
-        }
-        
-        footer {
-            text-align: center;
-            margin-top: 30px;
-            font-size: 0.9em;
-            color: #5a3921;
-        }
-        
-        .status {
-            text-align: center;
             font-weight: bold;
-            margin: 10px 0;
-            font-size: 18px;
+            transition: background 0.3s;
+        }
+        
+        .upgrade button:hover {
+            background: #ff7043;
+        }
+        
+        .upgrade button:disabled {
+            background: #7f5b46;
+            cursor: not-allowed;
+        }
+        
+        #environment {
+            background: rgba(0, 50, 70, 0.6);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        #environment-controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        
+        #environment-controls button {
+            background: #009688;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        #environment-controls button.active {
+            background: #00bcd4;
+            box-shadow: 0 0 10px rgba(0, 188, 212, 0.8);
+        }
+        
+        #logs {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+            height: 120px;
+            overflow-y: auto;
+            font-size: 0.9rem;
+        }
+        
+        .log-entry {
+            margin-bottom: 5px;
+            padding: 5px;
+            border-left: 3px solid #ffeb3b;
+            padding-left: 10px;
+        }
+        
+        #start-screen, #evolution-screen {
+            text-align: center;
+            padding: 30px;
+        }
+        
+        #start-screen h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: #ff9800;
+        }
+        
+        #start-screen p {
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        
+        #start-button {
+            background: #e91e63;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        #start-button:hover {
+            background: #f48fb1;
+            transform: scale(1.05);
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .progress-bar {
+            height: 10px;
+            background: #37474f;
+            border-radius: 5px;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: #00bcd4;
+            border-radius: 5px;
+            width: 0%;
+            transition: width 0.5s;
+        }
+        
+        .stage-info {
+            margin-top: 10px;
+            font-style: italic;
+            color: #80cbc4;
+        }
+        
+        .evolution-notification {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px 20px;
+            border-radius: 10px;
+            color: #ffeb3b;
+            font-weight: bold;
+            z-index: 100;
+            animation: fadeOut 3s forwards;
+        }
+        
+        @keyframes fadeOut {
+            0% { opacity: 1; top: 20px; }
+            70% { opacity: 1; top: 20px; }
+            100% { opacity: 0; top: -50px; }
+        }
+        
+        @media (max-width: 768px) {
+            #game-stats {
+                flex-wrap: wrap;
+            }
+            
+            .stat {
+                flex: 1 0 50%;
+                margin-bottom: 10px;
+            }
+            
+            #upgrades {
+                grid-template-columns: 1fr;
+            }
+            
+            #environment-controls {
+                gap: 10px;
+            }
+            
+            #environment-controls button {
+                padding: 6px 10px;
+                font-size: 0.9rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Средневековые Шахматы</h1>
-        <p class="subtitle">Рыцарская Битва за Королевство</p>
-        
-        <div class="status" id="status">Ваш ход (Белые)</div>
-        
-        <div class="chessboard" id="chessboard">
-            <!-- Доска будет сгенерирована JavaScript -->
+    <div id="game-container">
+        <div id="start-screen">
+            <h2>Эволюция: Борьба за Существование</h2>
+            <p>Вы - простейший организм в бескрайнем океане. Развивайтесь, потребляя ресурсы, приобретайте новые способности и приспосабливайтесь к изменяющейся среде. Ваша цель - пройти путь от микроскопической клетки до сложного многоклеточного организма и далее до разумного существа!</p>
+            <button id="start-button">Начать Эволюцию</button>
         </div>
         
-        <div class="game-settings">
-            <h3>Настройки игры:</h3>
-            <label>Игра против:
-                <select id="opponentType">
-                    <option value="human">Человека</option>
-                    <option value="bot">Бота</option>
-                </select>
-            </label>
+        <div id="game-screen" class="hidden">
+            <div id="game-header">
+                <h1 id="game-title">Эволюция: Борьба за Существование</h1>
+                <div id="game-stats">
+                    <div class="stat">
+                        <div>Энергия</div>
+                        <div class="stat-value" id="energy">100</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="energy-bar"></div>
+                        </div>
+                    </div>
+                    <div class="stat">
+                        <div>Стадия</div>
+                        <div class="stat-value" id="stage">1</div>
+                        <div id="stage-name">Простая клетка</div>
+                    </div>
+                    <div class="stat">
+                        <div>ДНК</div>
+                        <div class="stat-value" id="dna">0</div>
+                        <div>Эволюционные очки</div>
+                    </div>
+                    <div class="stat">
+                        <div>Время</div>
+                        <div class="stat-value" id="time">0</div>
+                        <div>Поколения</div>
+                    </div>
+                </div>
+            </div>
             
-            <label id="botLevelLabel" style="display: none;">Уровень бота:
-                <select id="botLevel">
-                    <option value="easy">Новичок (Легкий)</option>
-                    <option value="medium">Воин (Средний)</option>
-                    <option value="hard">Мастер (Сложный)</option>
-                </select>
-            </label>
+            <div id="game-content">
+                <div id="evolution-area">
+                    <div id="organism"></div>
+                    <!-- Resources will be generated here -->
+                </div>
+                
+                <div id="environment">
+                    <h3>Окружающая среда: <span id="environment-name">Нормальная</span></h3>
+                    <div id="environment-controls">
+                        <button id="btn-day" class="active">День</button>
+                        <button id="btn-night">Ночь</button>
+                        <button id="btn-cold">Холод</button>
+                        <button id="btn-warm">Тепло</button>
+                        <button id="btn-acid">Кислотная</button>
+                    </div>
+                </div>
+                
+                <div id="upgrades">
+                    <div class="upgrade">
+                        <h3>Фотосинтез</h3>
+                        <p>Позволяет получать энергию от солнца</p>
+                        <div>Стоимость: 10 ДНК</div>
+                        <button id="btn-photosynthesis" onclick="buyUpgrade('photosynthesis')">Приобрести</button>
+                    </div>
+                    <div class="upgrade">
+                        <h3>Хищничество</h3>
+                        <p>Позволяет потреблять другие клетки</p>
+                        <div>Стоимость: 20 ДНК</div>
+                        <button id="btn-predation" onclick="buyUpgrade('predation')">Приобрести</button>
+                    </div>
+                    <div class="upgrade">
+                        <h3>Движение</h3>
+                        <p>Позволяет主动移动寻找资源</p>
+                        <div>Стоимость: 15 ДНК</div>
+                        <button id="btn-movement" onclick="buyUpgrade('movement')">Приобрести</button>
+                    </div>
+                    <div class="upgrade">
+                        <h3>Защитная мембрана</h3>
+                        <p>Увеличивает выживаемость</p>
+                        <div>Стоимость: 25 ДНК</div>
+                        <button id="btn-membrane" onclick="buyUpgrade('membrane')">Приобрести</button>
+                    </div>
+                </div>
+                
+                <div id="logs">
+                    <h3>Журнал эволюции</h3>
+                    <div class="log-entry">Добро пожаловать в игру! Вы - простейший организм.</div>
+                </div>
+            </div>
         </div>
-        
-        <div class="controls">
-            <button id="newGame">Новая Игра</button>
-            <button id="undoMove">Отменить Ход</button>
-        </div>
-        
-        <div class="piece-info" id="pieceInfo">
-            <h3>Средневековые фигуры:</h3>
-            <p><strong>♔ ♚</strong> - Король и Королева</p>
-            <p><strong>♖ ♜</strong> - Ладьи (Крепостные башни)</p>
-            <p><strong>♘ ♞</strong> - Рыцари на конях</p>
-            <p><strong>♗ ♝</strong> - Епископы (Советники)</p>
-            <p><strong>♕ ♛</strong> - Королевские Гвардейцы</p>
-            <p><strong>♙ ♟</strong> - Пешие Воины</p>
-        </div>
-        
-        <footer>
-            © 2023 Средневековые Шахматы | Создано для рыцарских турниров
-        </footer>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const chessboard = document.getElementById('chessboard');
-            const statusElement = document.getElementById('status');
-            const newGameBtn = document.getElementById('newGame');
-            const undoMoveBtn = document.getElementById('undoMove');
-            const opponentTypeSelect = document.getElementById('opponentType');
-            const botLevelSelect = document.getElementById('botLevel');
-            const botLevelLabel = document.getElementById('botLevelLabel');
+        // Игровые переменные
+        let gameState = {
+            energy: 100,
+            maxEnergy: 100,
+            stage: 1,
+            dna: 0,
+            time: 0,
+            upgrades: {
+                photosynthesis: false,
+                predation: false,
+                movement: false,
+                membrane: false,
+                reproduction: false,
+                nervousSystem: false,
+                intelligence: false
+            },
+            environment: 'day',
+            gameActive: false,
+            stageNames: {
+                1: "Простая клетка",
+                2: "Многоклеточный организм",
+                3: "Членистоногое",
+                4: "Рыба",
+                5: "Земноводное",
+                6: "Пресмыкающееся",
+                7: "Млекопитающее",
+                8: "Примат",
+                9: "Гоминид",
+                10: "Человек разумный"
+            }
+        };
+        
+        // Элементы DOM
+        const startScreen = document.getElementById('start-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const energyElement = document.getElementById('energy');
+        const energyBar = document.getElementById('energy-bar');
+        const stageElement = document.getElementById('stage');
+        const stageNameElement = document.getElementById('stage-name');
+        const dnaElement = document.getElementById('dna');
+        const timeElement = document.getElementById('time');
+        const logsContainer = document.getElementById('logs');
+        const organismElement = document.getElementById('organism');
+        const evolutionArea = document.getElementById('evolution-area');
+        const environmentNameElement = document.getElementById('environment-name');
+        
+        // Начало игры
+        document.getElementById('start-button').addEventListener('click', startGame);
+        
+        // Кнопки среды
+        document.getElementById('btn-day').addEventListener('click', () => changeEnvironment('day'));
+        document.getElementById('btn-night').addEventListener('click', () => changeEnvironment('night'));
+        document.getElementById('btn-cold').addEventListener('click', () => changeEnvironment('cold'));
+        document.getElementById('btn-warm').addEventListener('click', () => changeEnvironment('warm'));
+        document.getElementById('btn-acid').addEventListener('click', () => changeEnvironment('acid'));
+        
+        // Инициализация организма и ресурсов
+        function initGameWorld() {
+            // Очистка ресурсов
+            document.querySelectorAll('.resource').forEach(res => res.remove());
             
-            // Шахматные фигуры с средневековой тематикой
-            const pieces = {
-                'r': '♜', // Черная ладья (крепостная башня)
-                'n': '♞', // Черный конь (рыцарь)
-                'b': '♝', // Черный слон (епископ)
-                'q': '♛', // Черный ферзь (королевский гвардеец)
-                'k': '♚', // Черный король
-                'p': '♟', // Черная пешка (пеший воин)
+            // Создаем организм в зависимости от стадии
+            updateOrganism();
+            
+            // Создаем ресурсы
+            createResources();
+        }
+        
+        // Обновление внешнего вида организма
+        function updateOrganism() {
+            let organismHTML = '';
+            const size = 50 + gameState.stage * 10;
+            
+            organismElement.style.width = `${size}px`;
+            organismElement.style.height = `${size}px`;
+            
+            // Внешний вид зависит от стадии и улучшений
+            if (gameState.stage === 1) {
+                organismHTML = `<div style="width:100%; height:100%; border-radius:50%; background:radial-gradient(circle at 30% 30%, #03a9f4, #0288d1); border:2px solid #01579b;"></div>`;
+            } else if (gameState.stage === 2) {
+                organismHTML = `<div style="width:100%; height:100%; border-radius:50%; background:radial-gradient(circle at 30% 30%, #4caf50, #2e7d32); border:2px solid #1b5e20; display:flex; flex-wrap:wrap; justify-content:center; align-items:center;">
+                    <div style="width:40%; height:40%; background:#388e3c; border-radius:50%; margin:2px;"></div>
+                    <div style="width:40%; height:40%; background:#388e3c; border-radius:50%; margin:2px;"></div>
+                    <div style="width:40%; height:40%; background:#388e3c; border-radius:50%; margin:2px;"></div>
+                    <div style="width:40%; height:40%; background:#388e3c; border-radius:50%; margin:2px;"></div>
+                </div>`;
+            } else if (gameState.stage === 3) {
+                organismHTML = `<div style="width:100%; height:100%; background:#795548; border-radius:20%; position:relative;">
+                    <div style="position:absolute; width:20%; height:30%; background:#5d4037; top:-10%; left:20%; border-radius:50%;"></div>
+                    <div style="position:absolute; width:20%; height:30%; background:#5d4037; top:-10%; left:60%; border-radius:50%;"></div>
+                    <div style="position:absolute; width:80%; height:20%; background:#6d4c41; bottom:10%; left:10%; border-radius:10px;"></div>
+                </div>`;
+            } else if (gameState.stage >= 4 && gameState.stage < 7) {
+                organismHTML = `<div style="width:100%; height:100%; background:linear-gradient(45deg, #78909c, #546e7a); border-radius:40% 40% 0 0; position:relative;">
+                    <div style="position:absolute; width:15%; height:20%; background:#607d8b; top:10%; left:20%; border-radius:50%;"></div>
+                    <div style="position:absolute; width:15%; height:20%; background:#607d8b; top:10%; left:65%; border-radius:50%;"></div>
+                    <div style="position:absolute; width:60%; height:10%; background:#90a4ae; bottom:15%; left:20%; border-radius:10px;"></div>
+                </div>`;
+            } else if (gameState.stage >= 7) {
+                organismHTML = `<div style="width:100%; height:100%; background:linear-gradient(45deg, #ffcc80, #ffb74d); border-radius:50% 50% 0 0; position:relative;">
+                    <div style="position:absolute; width:20%; height:25%; background:#ffa726; top:0; left:40%; border-radius:50%;"></div>
+                    <div style="position:absolute; width:10%; height:15%; background:#fff; top:15%; left:30%; border-radius:50%;"></div>
+                    <div style="position:absolute; width:10%; height:15%; background:#fff; top:15%; left:60%; border-radius:50%;"></div>
+                    <div style="position:absolute; width:5%; height:7%; background:#000; top:18%; left:33%; border-radius:50%;"></div>
+                    <div style="position:absolute; width:5%; height:7%; background:#000; top:18%; left:63%; border-radius:50%;"></div>
+                    <div style="position:absolute; width:40%; height:20%; background:#ffb74d; bottom:0; left:30%; border-radius:10px 10px 0 0;"></div>
+                </div>`;
+            }
+            
+            organismElement.innerHTML = organismHTML;
+            
+            // Добавляем эффекты улучшений
+            if (gameState.upgrades.movement) {
+                organismElement.style.animation = "pulse 1s infinite alternate";
+            }
+            
+            if (gameState.upgrades.membrane) {
+                organismElement.style.boxShadow = "0 0 15px #ffeb3b";
+            }
+        }
+        
+        // Создание ресурсов
+        function createResources() {
+            // Создаем ресурсы в виде маленьких кружков
+            for (let i = 0; i < 15; i++) {
+                const resource = document.createElement('div');
+                resource.className = 'resource';
                 
-                'R': '♖', // Белая ладья
-                'N': '♘', // Белый конь
-                'B': '♗', // Белый слон
-                'Q': '♕', // Белый ферзь
-                'K': '♔', // Белый король
-                'P': '♙'  // Белая пешка
+                const size = 5 + Math.random() * 10;
+                const x = 20 + Math.random() * (evolutionArea.offsetWidth - 40);
+                const y = 20 + Math.random() * (evolutionArea.offsetHeight - 40);
+                
+                resource.style.width = `${size}px`;
+                resource.style.height = `${size}px`;
+                resource.style.left = `${x}px`;
+                resource.style.top = `${y}px`;
+                
+                // Разные типы ресурсов
+                if (i % 3 === 0) {
+                    resource.style.background = '#ff9800'; // Органическая материя
+                } else if (i % 3 === 1) {
+                    resource.style.background = '#00bcd4'; // Минералы
+                } else {
+                    resource.style.background = '#8bc34a'; // Солнечная энергия
+                }
+                
+                evolutionArea.appendChild(resource);
+            }
+        }
+        
+        // Начать игру
+        function startGame() {
+            startScreen.classList.add('hidden');
+            gameScreen.classList.remove('hidden');
+            gameState.gameActive = true;
+            
+            // Инициализация игрового мира
+            initGameWorld();
+            
+            // Запуск игрового цикла
+            gameLoop();
+            
+            // Добавляем сообщение в журнал
+            addLog("Вы начали свою эволюцию как простая клетка.");
+        }
+        
+        // Игровой цикл
+        function gameLoop() {
+            if (!gameState.gameActive) return;
+            
+            // Увеличиваем время
+            gameState.time++;
+            timeElement.textContent = gameState.time;
+            
+            // Уменьшаем энергию со временем
+            gameState.energy -= 0.5;
+            
+            // Влияние среды на энергию
+            if (gameState.environment === 'cold') {
+                gameState.energy -= 0.3;
+            } else if (gameState.environment === 'acid') {
+                gameState.energy -= 0.8;
+            }
+            
+            // Если есть фотосинтез и день, получаем энергию
+            if (gameState.upgrades.photosynthesis && gameState.environment === 'day') {
+                gameState.energy += 0.8;
+                if (gameState.time % 50 === 0) {
+                    addLog("Фотосинтез дает вам энергию.");
+                }
+            }
+            
+            // Если есть хищничество, получаем энергию от ресурсов
+            if (gameState.upgrades.predation && gameState.time % 30 === 0) {
+                gameState.energy += 2;
+                if (gameState.time % 60 === 0) {
+                    addLog("Хищничество приносит дополнительную энергию.");
+                }
+            }
+            
+            // Ограничиваем энергию максимумом
+            if (gameState.energy > gameState.maxEnergy) {
+                gameState.energy = gameState.maxEnergy;
+            }
+            
+            // Проверяем смерть от недостатка энергии
+            if (gameState.energy <= 0) {
+                gameOver();
+                return;
+            }
+            
+            // Обновляем отображение энергии
+            updateEnergyDisplay();
+            
+            // Шанс получить ДНК
+            if (Math.random() < 0.02) {
+                gameState.dna++;
+                dnaElement.textContent = gameState.dna;
+                if (gameState.dna % 5 === 0) {
+                    addLog("Мутация! Получено ДНК.");
+                }
+            }
+            
+            // Проверяем эволюцию на следующую стадию
+            checkEvolution();
+            
+            // Обновляем доступность улучшений
+            updateUpgradesAvailability();
+            
+            // Продолжаем цикл
+            setTimeout(gameLoop, 100);
+        }
+        
+        // Обновление отображения энергии
+        function updateEnergyDisplay() {
+            energyElement.textContent = Math.floor(gameState.energy);
+            const energyPercent = (gameState.energy / gameState.maxEnergy) * 100;
+            energyBar.style.width = energyPercent + '%';
+            
+            // Меняем цвет в зависимости от уровня энергии
+            if (energyPercent > 50) {
+                energyBar.style.background = '#4caf50';
+            } else if (energyPercent > 25) {
+                energyBar.style.background = '#ff9800';
+            } else {
+                energyBar.style.background = '#f44336';
+            }
+        }
+        
+        // Покупка улучшения
+        function buyUpgrade(upgradeName) {
+            const cost = getUpgradeCost(upgradeName);
+            
+            if (gameState.dna >= cost && !gameState.upgrades[upgradeName]) {
+                gameState.dna -= cost;
+                gameState.upgrades[upgradeName] = true;
+                dnaElement.textContent = gameState.dna;
+                
+                // Эффекты в зависимости от улучшения
+                switch(upgradeName) {
+                    case 'photosynthesis':
+                        addLog("Вы развили способность к фотосинтезу!");
+                        break;
+                    case 'predation':
+                        addLog("Вы развили способность потреблять другие клетки!");
+                        break;
+                    case 'movement':
+                        addLog("Вы развили способность к движению!");
+                        break;
+                    case 'membrane':
+                        addLog("Вы развили защитную мембрану!");
+                        break;
+                }
+                
+                // Обновляем организм
+                updateOrganism();
+            }
+        }
+        
+        // Получить стоимость улучшения
+        function getUpgradeCost(upgradeName) {
+            const costs = {
+                photosynthesis: 10,
+                predation: 20,
+                movement: 15,
+                membrane: 25,
+                reproduction: 40,
+                nervousSystem: 60,
+                intelligence: 100
             };
             
-            // Начальная позиция
-            let board = [
-                ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'],
-                ['p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'],
-                ['', '', '', '', '', '', '', ''],
-                ['', '', '', '', '', '', '', ''],
-                ['', '', '', '', '', '', '', ''],
-                ['', '', '', '', '', '', '', ''],
-                ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'],
-                ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R']
-            ];
+            return costs[upgradeName] || 0;
+        }
+        
+        // Обновление доступности улучшений
+        function updateUpgradesAvailability() {
+            document.getElementById('btn-photosynthesis').disabled = gameState.upgrades.photosynthesis || gameState.dna < 10;
+            document.getElementById('btn-predation').disabled = gameState.upgrades.predation || gameState.dna < 20;
+            document.getElementById('btn-movement').disabled = gameState.upgrades.movement || gameState.dna < 15;
+            document.getElementById('btn-membrane').disabled = gameState.upgrades.membrane || gameState.dna < 25;
+        }
+        
+        // Изменение окружающей среды
+        function changeEnvironment(env) {
+            gameState.environment = env;
             
-            let selectedPiece = null;
-            let possibleMoves = [];
-            let moveHistory = [];
-            let currentPlayer = 'white';
-            let gameMode = 'human'; // 'human' или 'bot'
-            let botLevel = 'easy';
-            let gameActive = true;
+            // Обновляем активную кнопку
+            document.querySelectorAll('#environment-controls button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(`btn-${env}`).classList.add('active');
             
-            // Показать/скрыть настройки уровня бота
-            opponentTypeSelect.addEventListener('change', function() {
-                gameMode = this.value;
-                botLevelLabel.style.display = gameMode === 'bot' ? 'inline-block' : 'none';
-                updateStatus();
+            // Меняем фон в зависимости от среды
+            switch(env) {
+                case 'day':
+                    evolutionArea.style.background = 'linear-gradient(160deg, #004d40, #00251a)';
+                    environmentNameElement.textContent = 'День';
+                    addLog("Наступил день. Светло и тепло.");
+                    break;
+                case 'night':
+                    evolutionArea.style.background = 'linear-gradient(160deg, #0d1b1a, #00100c)';
+                    environmentNameElement.textContent = 'Ночь';
+                    addLog("Наступила ночь. Темно и прохладно.");
+                    break;
+                case 'cold':
+                    evolutionArea.style.background = 'linear-gradient(160deg, #1e3a5f, #0c1a33)';
+                    environmentNameElement.textContent = 'Холод';
+                    addLog("Стало холодно. Энергия тратится быстрее.");
+                    break;
+                case 'warm':
+                    evolutionArea.style.background = 'linear-gradient(160deg, #5d4037, #3e2723)';
+                    environmentNameElement.textContent = 'Тепло';
+                    addLog("Стало тепло. Условия благоприятные.");
+                    break;
+                case 'acid':
+                    evolutionArea.style.background = 'linear-gradient(160deg, #33691e, #1b5e20)';
+                    environmentNameElement.textContent = 'Кислотная';
+                    addLog("Кислотная среда! Опасно для жизни!");
+                    break;
+            }
+        }
+        
+        // Проверка эволюции на следующую стадию
+        function checkEvolution() {
+            const evolutionThreshold = gameState.stage * 50;
+            
+            if (gameState.time >= evolutionThreshold && gameState.stage < 10) {
+                gameState.stage++;
+                stageElement.textContent = gameState.stage;
+                stageNameElement.textContent = gameState.stageNames[gameState.stage];
+                
+                // Увеличиваем максимальную энергию
+                gameState.maxEnergy += 50;
+                gameState.energy = gameState.maxEnergy;
+                updateEnergyDisplay();
+                
+                // Показываем уведомление об эволюции
+                showEvolutionNotification(`Вы эволюционировали в ${gameState.stageNames[gameState.stage]}!`);
+                
+                // Добавляем запись в журнал
+                addLog(`Эволюция! Теперь вы ${gameState.stageNames[gameState.stage]}.`);
+                
+                // Обновляем организм
+                updateOrganism();
+            }
+        }
+        
+        // Показать уведомление об эволюции
+        function showEvolutionNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'evolution-notification';
+            notification.textContent = message;
+            
+            document.getElementById('game-container').appendChild(notification);
+            
+            // Удаляем уведомление после анимации
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+        
+        // Добавление записи в журнал
+        function addLog(message) {
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry';
+            logEntry.textContent = message;
+            
+            logsContainer.appendChild(logEntry);
+            
+            // Прокручиваем вниз
+            logsContainer.scrollTop = logsContainer.scrollHeight;
+            
+            // Ограничиваем количество записей
+            if (logsContainer.children.length > 10) {
+                logsContainer.removeChild(logsContainer.children[0]);
+            }
+        }
+        
+        // Конец игры
+        function gameOver() {
+            gameState.gameActive = false;
+            addLog("Вы не выжили. Эволюция прекратилась.");
+            addLog(`Итог: вы достигли стадии "${gameState.stageNames[gameState.stage]}" за ${gameState.time} поколений.`);
+            
+            // Показываем кнопку перезапуска
+            const restartButton = document.createElement('button');
+            restartButton.textContent = "Начать заново";
+            restartButton.style.background = '#e91e63';
+            restartButton.style.color = 'white';
+            restartButton.style.border = 'none';
+            restartButton.style.padding = '10px 20px';
+            restartButton.style.borderRadius = '5px';
+            restartButton.style.cursor = 'pointer';
+            restartButton.style.marginTop = '10px';
+            
+            restartButton.addEventListener('click', () => {
+                location.reload();
             });
             
-            botLevelSelect.addEventListener('change', function() {
-                botLevel = this.value;
-            });
+            logsContainer.appendChild(restartButton);
+        }
+        
+        // Обработка кликов по области эволюции для сбора ресурсов
+        evolutionArea.addEventListener('click', (e) => {
+            if (!gameState.gameActive) return;
             
-            // Создание доски
-            function createBoard() {
-                chessboard.innerHTML = '';
+            // Проверяем, попал ли клик по ресурсу
+            if (e.target.classList.contains('resource')) {
+                // Удаляем ресурс
+                e.target.remove();
                 
-                for (let row = 0; row < 8; row++) {
-                    const rowElement = document.createElement('div');
-                    rowElement.className = 'row';
-                    
-                    for (let col = 0; col < 8; col++) {
-                        const square = document.createElement('div');
-                        square.className = `square ${(row + col) % 2 === 0 ? 'light' : 'dark'}`;
-                        square.dataset.row = row;
-                        square.dataset.col = col;
-                        
-                        if (board[row][col] !== '') {
-                            const piece = document.createElement('div');
-                            piece.textContent = pieces[board[row][col]];
-                            piece.style.cursor = 'pointer';
-                            square.appendChild(piece);
-                        }
-                        
-                        square.addEventListener('click', () => handleSquareClick(row, col));
-                        rowElement.appendChild(square);
-                    }
-                    
-                    chessboard.appendChild(rowElement);
+                // Получаем энергию от ресурса
+                const energyGain = 5 + Math.floor(Math.random() * 10);
+                gameState.energy += energyGain;
+                
+                if (gameState.energy > gameState.maxEnergy) {
+                    gameState.energy = gameState.maxEnergy;
                 }
+                
+                updateEnergyDisplay();
+                addLog(`Вы поглотили ресурс и получили ${energyGain} энергии.`);
+                
+                // Создаем новый ресурс через некоторое время
+                setTimeout(createResources, 1000);
             }
-            
-            // Обработка клика по клетке
-            function handleSquareClick(row, col) {
-                if (!gameActive) return;
-                
-                // Если это ход бота, игнорируем клики
-                if (gameMode === 'bot' && currentPlayer === 'black') return;
-                
-                // Если есть возможные ходы и кликнули на один из них
-                if (possibleMoves.some(move => move.row === row && move.col === col)) {
-                    makeMove(selectedPiece.row, selectedPiece.col, row, col);
-                    return;
-                }
-                
-                // Если клетка пустая или фигура другого цвета, сбрасываем выделение
-                if (board[row][col] === '' || 
-                    (currentPlayer === 'white' && board[row][col] === board[row][col].toLowerCase()) ||
-                    (currentPlayer === 'black' && board[row][col] === board[row][col].toUpperCase())) {
-                    selectedPiece = null;
-                    possibleMoves = [];
-                    createBoard();
-                    return;
-                }
-                
-                // Выбираем фигуру
-                selectedPiece = { row, col };
-                possibleMoves = getPossibleMoves(row, col);
-                createBoard();
-                
-                // Подсвечиваем выбранную фигуру и возможные ходы
-                const squares = document.querySelectorAll('.square');
-                squares.forEach(square => {
-                    const squareRow = parseInt(square.dataset.row);
-                    const squareCol = parseInt(square.dataset.col);
-                    
-                    if (squareRow === row && squareCol === col) {
-                        square.classList.add('selected');
-                    }
-                    
-                    if (possibleMoves.some(move => move.row === squareRow && move.col === squareCol)) {
-                        square.classList.add('possible-move');
-                    }
-                });
-            }
-            
-            // Выполнение хода
-            function makeMove(fromRow, fromCol, toRow, toCol) {
-                moveHistory.push(JSON.parse(JSON.stringify(board))); // Сохраняем состояние доски
-                
-                // Выполняем ход
-                board[toRow][toCol] = board[fromRow][fromCol];
-                board[fromRow][fromCol] = '';
-                
-                // Меняем игрока
-                currentPlayer = currentPlayer === 'white' ? 'black' : 'white';
-                
-                // Сбрасываем выделение
-                selectedPiece = null;
-                possibleMoves = [];
-                createBoard();
-                updateStatus();
-                
-                // Если играем против бота и теперь его ход
-                if (gameMode === 'bot' && currentPlayer === 'black' && gameActive) {
-                    setTimeout(makeBotMove, 500); // Задержка для визуализации
-                }
-            }
-            
-            // Ход бота
-            function makeBotMove() {
-                let moves = [];
-                
-                // Собираем все возможные ходы для черных
-                for (let row = 0; row < 8; row++) {
-                    for (let col = 0; col < 8; col++) {
-                        if (board[row][col] !== '' && board[row][col] === board[row][col].toLowerCase()) {
-                            const pieceMoves = getPossibleMoves(row, col);
-                            pieceMoves.forEach(move => {
-                                moves.push({
-                                    from: { row, col },
-                                    to: move
-                                });
-                            });
-                        }
-                    }
-                }
-                
-                if (moves.length === 0) {
-                    // Нет возможных ходов - мат или пат
-                    gameActive = false;
-                    updateStatus();
-                    return;
-                }
-                
-                // Выбираем ход в зависимости от уровня сложности
-                let selectedMove;
-                
-                switch (botLevel) {
-                    case 'easy': // Легкий - случайный ход
-                        selectedMove = moves[Math.floor(Math.random() * moves.length)];
-                        break;
-                        
-                    case 'medium': // Средний - иногда берет фигуры, если есть возможность
-                        const capturingMoves = moves.filter(move => 
-                            board[move.to.row][move.to.col] !== '' && 
-                            board[move.to.row][move.to.col] === board[move.to.row][move.to.col].toUpperCase());
-                        
-                        if (capturingMoves.length > 0 && Math.random() > 0.3) {
-                            selectedMove = capturingMoves[Math.floor(Math.random() * capturingMoves.length)];
-                        } else {
-                            selectedMove = moves[Math.floor(Math.random() * moves.length)];
-                        }
-                        break;
-                        
-                    case 'hard': // Сложный - старается брать фигуры и защищать свои
-                        // Сначала ищем взятия
-                        const allCapturingMoves = moves.filter(move => 
-                            board[move.to.row][move.to.col] !== '' && 
-                            board[move.to.row][move.to.col] === board[move.to.row][move.to.col].toUpperCase());
-                        
-                        if (allCapturingMoves.length > 0) {
-                            // Выбираем взятие с самой ценной фигурой
-                            selectedMove = allCapturingMoves.reduce((best, current) => {
-                                const currentPiece = board[current.to.row][current.to.col];
-                                const bestPiece = best ? board[best.to.row][best.to.col] : '';
-                                return getPieceValue(currentPiece) > getPieceValue(bestPiece) ? current : best;
-                            }, allCapturingMoves[0]);
-                        } else {
-                            // Если нет взятий, делаем случайный ход
-                            selectedMove = moves[Math.floor(Math.random() * moves.length)];
-                        }
-                        break;
-                }
-                
-                // Выполняем выбранный ход
-                makeMove(selectedMove.from.row, selectedMove.from.col, selectedMove.to.row, selectedMove.to.col);
-            }
-            
-            // Значение фигуры для бота
-            function getPieceValue(piece) {
-                if (!piece) return 0;
-                const lowerPiece = piece.toLowerCase();
-                switch (lowerPiece) {
-                    case 'p': return 1;
-                    case 'n': case 'b': return 3;
-                    case 'r': return 5;
-                    case 'q': return 9;
-                    case 'k': return 100;
-                    default: return 0;
-                }
-            }
-            
-            // Получение возможных ходов (упрощенная версия)
-            function getPossibleMoves(row, col) {
-                const piece = board[row][col];
-                const moves = [];
-                
-                if (piece === '') return moves;
-                
-                const isWhite = piece === piece.toUpperCase();
-                
-                // Пешка
-                if (piece.toLowerCase() === 'p') {
-                    if (isWhite) {
-                        // Ход вперед
-                        if (row > 0 && board[row-1][col] === '') {
-                            moves.push({ row: row-1, col });
-                            // Двойной ход с начальной позиции
-                            if (row === 6 && board[row-2][col] === '') {
-                                moves.push({ row: row-2, col });
-                            }
-                        }
-                        
-                        // Взятие
-                        if (row > 0 && col > 0 && board[row-1][col-1] !== '' && board[row-1][col-1] === board[row-1][col-1].toLowerCase()) {
-                            moves.push({ row: row-1, col: col-1 });
-                        }
-                        if (row > 0 && col < 7 && board[row-1][col+1] !== '' && board[row-1][col+1] === board[row-1][col+1].toLowerCase()) {
-                            moves.push({ row: row-1, col: col+1 });
-                        }
-                    } else {
-                        // Ход вперед
-                        if (row < 7 && board[row+1][col] === '') {
-                            moves.push({ row: row+1, col });
-                            // Двойной ход с начальной позиции
-                            if (row === 1 && board[row+2][col] === '') {
-                                moves.push({ row: row+2, col });
-                            }
-                        }
-                        
-                        // Взятие
-                        if (row < 7 && col > 0 && board[row+1][col-1] !== '' && board[row+1][col-1] === board[row+1][col-1].toUpperCase()) {
-                            moves.push({ row: row+1, col: col-1 });
-                        }
-                        if (row < 7 && col < 7 && board[row+1][col+1] !== '' && board[row+1][col+1] === board[row+1][col+1].toUpperCase()) {
-                            moves.push({ row: row+1, col: col+1 });
-                        }
-                    }
-                }
-                // Ладья
-                else if (piece.toLowerCase() === 'r') {
-                    const directions = [[-1, 0], [1, 0], [0, -1], [0, 1]];
-                    for (const [dr, dc] of directions) {
-                        for (let i = 1; i < 8; i++) {
-                            const newRow = row + dr * i;
-                            const newCol = col + dc * i;
-                            if (newRow < 0 || newRow > 7 || newCol < 0 || newCol > 7) break;
-                            
-                            if (board[newRow][newCol] === '') {
-                                moves.push({ row: newRow, col: newCol });
-                            } else {
-                                if ((isWhite && board[newRow][newCol] === board[newRow][newCol].toLowerCase()) ||
-                                    (!isWhite && board[newRow][newCol] === board[newRow][newCol].toUpperCase())) {
-                                    moves.push({ row: newRow, col: newCol });
-                                }
-                                break;
-                            }
-                        }
-                    }
-                }
-                // Конь
-                else if (piece.toLowerCase() === 'n') {
-                    const knightMoves = [
-                        [-2, -1], [-2, 1], [-1, -2], [-1, 2],
-                        [1, -2], [1, 2], [2, -1], [2, 1]
-                    ];
-                    
-                    for (const [dr, dc] of knightMoves) {
-                        const newRow = row + dr;
-                        const newCol = col + dc;
-                        if (newRow >= 0 && newRow < 8 && newCol >= 0 && newCol < 8) {
-                            if (board[newRow][newCol] === '' || 
-                                (isWhite && board[newRow][newCol] === board[newRow][newCol].toLowerCase()) ||
-                                (!isWhite && board[newRow][newCol] === board[newRow][newCol].toUpperCase())) {
-                                moves.push({ row: newRow, col: newCol });
-                            }
-                        }
-                    }
-                }
-                // Слон
-                else if (piece.toLowerCase() === 'b') {
-                    const directions = [[-1, -1], [-1, 1], [1, -1], [1, 1]];
-                    for (const [dr, dc] of directions) {
-                        for (let i = 1; i < 8; i++) {
-                            const newRow = row + dr * i;
-                            const newCol = col + dc * i;
-                            if (newRow < 0 || newRow > 7 || newCol < 0 || newCol > 7) break;
-                            
-                            if (board[newRow][newCol] === '') {
-                                moves.push({ row: newRow, col: newCol });
-                            } else {
-                                if ((isWhite && board[newRow][newCol] === board[newRow][newCol].toLowerCase()) ||
-                                    (!isWhite && board[newRow][newCol] === board[newRow][newCol].toUpperCase())) {
-                                    moves.push({ row: newRow, col: newCol });
-                                }
-                                break;
-                            }
-                        }
-                    }
-                }
-                // Ферзь
-                else if (piece.toLowerCase() === 'q') {
-                    // Комбинация ладьи и слона
-                    const directions = [
-                        [-1, 0], [1, 0], [0, -1], [0, 1], // Ладья
-                        [-1, -1], [-1, 1], [1, -1], [1, 1] // Слон
-                    ];
-                    
-                    for (const [dr, dc] of directions) {
-                        for (let i = 1; i < 8; i++) {
-                            const newRow = row + dr * i;
-                            const newCol = col + dc * i;
-                            if (newRow < 0 || newRow > 7 || newCol < 0 || newCol > 7) break;
-                            
-                            if (board[newRow][newCol] === '') {
-                                moves.push({ row: newRow, col: newCol });
-                            } else {
-                                if ((isWhite && board[newRow][newCol] === board[newRow][newCol].toLowerCase()) ||
-                                    (!isWhite && board[newRow][newCol] === board[newRow][newCol].toUpperCase())) {
-                                    moves.push({ row: newRow, col: newCol });
-                                }
-                                break;
-                            }
-                        }
-                    }
-                }
-                // Король
-                else if (piece.toLowerCase() === 'k') {
-                    const kingMoves = [
-                        [-1, -1], [-1, 0], [-1, 1],
-                        [0, -1], [0, 1],
-                        [1, -1], [1, 0], [1, 1]
-                    ];
-                    
-                    for (const [dr, dc] of kingMoves) {
-                        const newRow = row + dr;
-                        const newCol = col + dc;
-                        if (newRow >= 0 && newRow < 8 && newCol >= 0 && newCol < 8) {
-                            if (board[newRow][newCol] === '' || 
-                                (isWhite && board[newRow][newCol] === board[newRow][newCol].toLowerCase()) ||
-                                (!isWhite && board[newRow][newCol] === board[newRow][newCol].toUpperCase())) {
-                                moves.push({ row: newRow, col: newCol });
-                            }
-                        }
-                    }
-                }
-                
-                return moves;
-            }
-            
-            // Обновление статуса игры
-            function updateStatus() {
-                if (!gameActive) {
-                    statusElement.textContent = `Игра окончена. ${currentPlayer === 'white' ? 'Черные победили!' : 'Белые победили!'}`;
-                    return;
-                }
-                
-                if (gameMode === 'bot') {
-                    statusElement.textContent = currentPlayer === 'white' 
-                        ? 'Ваш ход (Белые)' 
-                        : 'Бот думает...';
-                } else {
-                    statusElement.textContent = currentPlayer === 'white' 
-                        ? 'Ход белых' 
-                        : 'Ход черных';
-                }
-            }
-            
-            // Новая игра
-            newGameBtn.addEventListener('click', function() {
-                board = [
-                    ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'],
-                    ['p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'],
-                    ['', '', '', '', '', '', '', ''],
-                    ['', '', '', '', '', '', '', ''],
-                    ['', '', '', '', '', '', '', ''],
-                    ['', '', '', '', '', '', '', ''],
-                    ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'],
-                    ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R']
-                ];
-                selectedPiece = null;
-                possibleMoves = [];
-                moveHistory = [];
-                currentPlayer = 'white';
-                gameActive = true;
-                createBoard();
-                updateStatus();
-                
-                // Если играем против бота и он играет белыми
-                if (gameMode === 'bot' && botLevelSelect.value === 'hard') {
-                    currentPlayer = 'black'; // Для сложного уровня пусть бот играет черными
-                    setTimeout(makeBotMove, 500);
-                }
-            });
-            
-            // Отмена хода
-            undoMoveBtn.addEventListener('click', function() {
-                if (moveHistory.length > 0) {
-                    board = moveHistory.pop();
-                    currentPlayer = currentPlayer === 'white' ? 'black' : 'white';
-                    selectedPiece = null;
-                    possibleMoves = [];
-                    gameActive = true;
-                    createBoard();
-                    updateStatus();
-                }
-            });
-            
-            // Инициализация доски
-            createBoard();
-            updateStatus();
         });
+        
+        // Добавляем CSS анимацию
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes pulse {
+                from { transform: translate(-50%, -50%) scale(1); }
+                to { transform: translate(-50%, -50%) scale(1.05); }
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 </html>
