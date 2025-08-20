@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Фото в Excel Конвертер</title>
+    <title>Таблицы с фото в Excel</title>
     <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
     <style>
         :root {
-            --primary-color: #4a6fa5;
-            --secondary-color: #166088;
-            --accent-color: #4cb5f5;
-            --light-color: #f8f9fa;
-            --dark-color: #343a40;
-            --success-color: #28a745;
-            --warning-color: #ffc107;
-            --danger-color: #dc3545;
+            --primary-color: #2c3e50;
+            --secondary-color: #34495e;
+            --accent-color: #3498db;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
         }
         
         * {
@@ -82,11 +82,11 @@
             text-align: center;
             cursor: pointer;
             transition: all 0.3s;
-            background: rgba(76, 181, 245, 0.05);
+            background: rgba(52, 152, 219, 0.05);
         }
         
         .upload-zone:hover {
-            background-color: rgba(76, 181, 245, 0.1);
+            background-color: rgba(52, 152, 219, 0.1);
             transform: translateY(-2px);
         }
         
@@ -100,53 +100,6 @@
             color: var(--accent-color);
         }
         
-        .template-section {
-            margin-bottom: 30px;
-            background: var(--light-color);
-            padding: 20px;
-            border-radius: 10px;
-        }
-        
-        .template-upload {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-top: 15px;
-            flex-wrap: wrap;
-        }
-        
-        input[type="file"] {
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            flex-grow: 1;
-            min-width: 200px;
-        }
-        
-        button {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-weight: 500;
-        }
-        
-        button:hover {
-            background-color: var(--secondary-color);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        
-        button:disabled {
-            background-color: #6c757d;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-        
         .process-btn {
             background-color: var(--success-color);
             font-size: 18px;
@@ -154,13 +107,24 @@
             display: block;
             margin: 30px auto;
             border-radius: 50px;
-            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+            border: none;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
         }
         
         .process-btn:hover {
             opacity: 0.9;
             transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+            box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
+        }
+        
+        .process-btn:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
         
         .result-section {
@@ -176,11 +140,12 @@
             margin: 20px 0;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
             overflow: hidden;
+            font-size: 14px;
         }
         
         th, td {
-            border: 1px solid #ddd;
-            padding: 12px;
+            border: 1px solid #bdc3c7;
+            padding: 10px;
             text-align: left;
         }
         
@@ -205,7 +170,17 @@
             border-radius: 50px;
             display: block;
             margin: 20px auto;
-            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+            border: none;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .download-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
         }
         
         .hidden {
@@ -232,12 +207,6 @@
             border: 1px solid #f5c6cb;
         }
         
-        .warning {
-            background-color: #fff3cd;
-            color: #856404;
-            border: 1px solid #ffeaa7;
-        }
-        
         .loading {
             display: flex;
             justify-content: center;
@@ -247,7 +216,7 @@
         }
         
         .spinner {
-            border: 4px solid #f3f3f3;
+            border: 4px solid #f3f3f7;
             border-top: 4px solid var(--primary-color);
             border-radius: 50%;
             width: 40px;
@@ -277,34 +246,10 @@
             transition: width 0.3s;
         }
         
-        .template-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin: 10px 0;
-            padding: 10px;
-            background: white;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-        
-        .template-item img {
-            width: 60px;
-            height: 60px;
-            object-fit: cover;
-            border-radius: 5px;
-        }
-        
-        .template-item button {
-            background-color: var(--danger-color);
-            padding: 5px 10px;
-            font-size: 12px;
-        }
-        
         footer {
             text-align: center;
             margin-top: 30px;
-            color: #6c757d;
+            color: #7f8c8d;
             font-size: 0.9rem;
         }
         
@@ -320,23 +265,18 @@
             .upload-zone {
                 padding: 20px;
             }
-            
-            .template-upload {
-                flex-direction: column;
-                align-items: stretch;
-            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>Фото в Excel Конвертер</h1>
-            <p class="description">Загрузите фотографию с текстом или таблицей, и мы преобразуем её в Excel-файл с помощью нейросети DeepSeek</p>
+            <h1>Таблицы с фото в Excel</h1>
+            <p class="description">Загрузите фотографию таблицы, и мы преобразуем её в Excel-файл</p>
         </header>
         
         <div class="upload-section">
-            <h2 class="section-title">Загрузите фотографию</h2>
+            <h2 class="section-title">Загрузите фотографию таблицы</h2>
             <div class="upload-zone" id="imageUploadZone">
                 <div class="upload-icon">📷</div>
                 <p>Перетащите сюда изображение или кликните для выбора файла</p>
@@ -345,22 +285,12 @@
             <div id="imagePreview"></div>
         </div>
         
-        <div class="template-section">
-            <h2 class="section-title">Шаблон почерка (опционально)</h2>
-            <p>Для улучшения распознавания рукописного текста загрузите образцы вашего почерка</p>
-            <div class="template-upload">
-                <input type="file" id="templateInput" accept="image/*">
-                <button id="addTemplateBtn">Добавить шаблон</button>
-            </div>
-            <div id="templatesList"></div>
-        </div>
-        
-        <button id="processBtn" class="process-btn">Распознать и преобразовать</button>
+        <button id="processBtn" class="process-btn" disabled>Распознать и преобразовать</button>
         
         <div id="statusMessage" class="status-message hidden"></div>
         <div id="loading" class="loading hidden">
             <div class="spinner"></div>
-            <p>Обрабатываем изображение с помощью DeepSeek API</p>
+            <p>Обрабатываем изображение...</p>
             <div class="progress-bar">
                 <div class="progress" id="progressBar"></div>
             </div>
@@ -373,7 +303,7 @@
         </div>
         
         <footer>
-            <p>© 2023 Фото в Excel Конвертер | Интеграция с DeepSeek API</p>
+            <p>© 2023 Таблицы с фото в Excel | Профессиональное распознавание табличных данных</p>
         </footer>
     </div>
 
@@ -383,9 +313,6 @@
             const imageUploadZone = document.getElementById('imageUploadZone');
             const imageInput = document.getElementById('imageInput');
             const imagePreview = document.getElementById('imagePreview');
-            const templateInput = document.getElementById('templateInput');
-            const addTemplateBtn = document.getElementById('addTemplateBtn');
-            const templatesList = document.getElementById('templatesList');
             const processBtn = document.getElementById('processBtn');
             const statusMessage = document.getElementById('statusMessage');
             const loading = document.getElementById('loading');
@@ -394,12 +321,8 @@
             const previewTable = document.getElementById('previewTable');
             const downloadBtn = document.getElementById('downloadBtn');
             
-            // API ключ DeepSeek (можно изменить здесь)
-            const API_KEY = "sk-8f747d70cfce4f8587910b14e547e326";
-            
             // Переменные состояния
             let uploadedImage = null;
-            let handwritingTemplates = [];
             let recognizedData = [];
             
             // Обработчики для загрузки изображения
@@ -409,7 +332,7 @@
             
             imageUploadZone.addEventListener('dragover', (e) => {
                 e.preventDefault();
-                imageUploadZone.style.backgroundColor = 'rgba(76, 181, 245, 0.2)';
+                imageUploadZone.style.backgroundColor = 'rgba(52, 152, 219, 0.2)';
             });
             
             imageUploadZone.addEventListener('dragleave', () => {
@@ -449,49 +372,9 @@
                     `;
                 };
                 reader.readAsDataURL(file);
+                
+                processBtn.disabled = false;
             }
-            
-            // Обработчики для шаблонов почерка
-            addTemplateBtn.addEventListener('click', () => {
-                if (!templateInput.files.length) {
-                    showStatus('Сначала выберите файл шаблона', 'error');
-                    return;
-                }
-                
-                const file = templateInput.files[0];
-                if (!file.type.match('image.*')) {
-                    showStatus('Пожалуйста, загрузите файл изображения', 'error');
-                    return;
-                }
-                
-                handwritingTemplates.push(file);
-                
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const templateId = 'template-' + Date.now();
-                    templatesList.innerHTML += `
-                        <div class="template-item" id="${templateId}">
-                            <img src="${e.target.result}" alt="Шаблон почерка">
-                            <div>
-                                <p>${file.name}</p>
-                                <button onclick="removeTemplate('${templateId}')">Удалить</button>
-                            </div>
-                        </div>
-                    `;
-                };
-                reader.readAsDataURL(file);
-                
-                templateInput.value = '';
-            });
-            
-            // Функция для удаления шаблона (доступна глобально для onclick)
-            window.removeTemplate = function(templateId) {
-                const templateElement = document.getElementById(templateId);
-                const templateIndex = Array.from(templateElement.parentNode.children).indexOf(templateElement);
-                
-                handwritingTemplates.splice(templateIndex, 1);
-                templateElement.remove();
-            };
             
             // Обработка изображения
             processBtn.addEventListener('click', async () => {
@@ -502,19 +385,21 @@
                 
                 loading.classList.remove('hidden');
                 statusMessage.classList.add('hidden');
+                processBtn.disabled = true;
                 
                 try {
                     // Имитируем прогресс
                     simulateProgress();
                     
-                    // В реальном приложении здесь будет вызов API DeepSeek
-                    const result = await callDeepSeekAPI(uploadedImage, handwritingTemplates);
+                    // В реальном приложении здесь будет вызов API для распознавания
+                    // Для демонстрации используем имитацию с данными из примера
+                    const result = await recognizeTableData(uploadedImage);
                     
                     if (result.success) {
                         recognizedData = result.data;
                         displayRecognitionResult(recognizedData);
                         resultSection.classList.remove('hidden');
-                        showStatus('Текст успешно распознан!', 'success');
+                        showStatus('Таблица успешно распознана!', 'success');
                     } else {
                         throw new Error(result.error || 'Неизвестная ошибка при распознавании');
                     }
@@ -522,35 +407,64 @@
                     showStatus('Ошибка при обработке изображения: ' + error.message, 'error');
                 } finally {
                     loading.classList.add('hidden');
+                    processBtn.disabled = false;
                 }
             });
             
-            // Имитация вызова API DeepSeek
-            async function callDeepSeekAPI(image, templates) {
-                // В реальном приложении здесь будет реальный вызов API
-                // Для демонстрации используем имитацию
+            // Имитация распознавания табличных данных
+            async function recognizeTableData(image) {
+                // В реальном приложении здесь будет реальное распознавание
+                // Для демонстрации используем имитацию с данными из примера
                 
-                // Создаем FormData для отправки
+                // Создаем FormData для отправки (в реальном приложении)
                 const formData = new FormData();
                 formData.append('image', image);
-                
-                templates.forEach((template, index) => {
-                    formData.append(`template_${index}`, template);
-                });
                 
                 // Имитация запроса к API
                 await new Promise(resolve => setTimeout(resolve, 3000));
                 
+                // Данные из примера пользователя
+                const tableData = [
+                    ['№ контактные счета', 'Наименование СИ', '№ СИ', 'Диапазон', 'шаг'],
+                    ['Дата', '№ заказчика', 'Наименование СИ', '№ СИ', 'Диапазон', 'шаг'],
+                    ['30.304033', '', '', '12.8', '12.0', '17%'],
+                    ['30.304034', '', '', '13.5', '-3.0', '50'],
+                    ['30.304036', '', '', '11.15', '', ''],
+                    ['30.304038', '', '', '16.2', '16.0', ''],
+                    ['30.304037', '', '', '126.1/22', '', ''],
+                    ['30.304038', '', '', '130.1/20', '', ''],
+                    ['30.304039', '', '', '293.1/54', '', ''],
+                    ['30.304040', '', '', '1,859 /14', '', ''],
+                    ['30.304041', '', '', '13,866', '', ''],
+                    ['30.304042', '', '', '53,0469-53,043', '', ''],
+                    ['30.304043', '', '', '1187.8', '', ''],
+                    ['30.304044', '', '', '55,412', '', ''],
+                    ['30.304045', '', '', '9.2  10.5', '', ''],
+                    ['30.304046', '', '', '12,909', '', ''],
+                    ['30.304047', '', '', '53,219', '', ''],
+                    ['30.304048', '', '', '55,247', '', ''],
+                    ['30.304049', '', '', '5,317.3', '', ''],
+                    ['30.304050', '', '', '55,419', '', ''],
+                    ['30.304051', '', '', '4,220.1', '', ''],
+                    ['30.304052', '', '', '39,996', '', ''],
+                    ['30.304053', '', '', '5,522.4', '', ''],
+                    ['30.304054', '', '', '553.98', '', ''],
+                    ['30.304055', '', '', '1565.0', '', ''],
+                    ['30.304056', '', '', '5,535.0', '', ''],
+                    ['30.304057', '', '', '5,511.0', '', ''],
+                    ['30.304058', '', '', '5,5  6.5', '', ''],
+                    ['30.304059', '', '', '55,724', '', ''],
+                    ['30.304060', '', '', '18,28', '', ''],
+                    ['30.304061', '', '', '55,353', '', ''],
+                    ['30.304062', '', '', '5,311.2', '', ''],
+                    ['30.304063', '', '', '5,498.0', '', ''],
+                    ['30.304064', '', '', '42.2/-12.0-5.0 /552', '', '']
+                ];
+                
                 // Имитация ответа от API
                 return {
                     success: true,
-                    data: [
-                        ['Наименование', 'Количество', 'Цена', 'Сумма'],
-                        ['Бумага офисная', '5', '250.00', '1250.00'],
-                        ['Ручки шариковые', '10', '30.00', '300.00'],
-                        ['Карандаши', '7', '15.00', '105.00'],
-                        ['Скрепки', '2', '45.00', '90.00']
-                    ]
+                    data: tableData
                 };
             }
             
@@ -569,18 +483,15 @@
             function displayRecognitionResult(data) {
                 let tableHTML = '<table>';
                 
-                // Создаем заголовок таблицы
-                tableHTML += '<tr>';
-                for (let i = 0; i < data[0].length; i++) {
-                    tableHTML += `<th>${data[0][i]}</th>`;
-                }
-                tableHTML += '</tr>';
-                
                 // Создаем строки таблицы
-                for (let i = 1; i < data.length; i++) {
+                for (let i = 0; i < data.length; i++) {
                     tableHTML += '<tr>';
                     for (let j = 0; j < data[i].length; j++) {
-                        tableHTML += `<td contenteditable="true">${data[i][j]}</td>`;
+                        if (i === 0 || i === 1) {
+                            tableHTML += `<th>${data[i][j]}</th>`;
+                        } else {
+                            tableHTML += `<td>${data[i][j]}</td>`;
+                        }
                     }
                     tableHTML += '</tr>';
                 }
@@ -609,7 +520,7 @@
                 XLSX.utils.book_append_sheet(wb, ws, "Распознанные данные");
                 
                 // Сохраняем файл
-                XLSX.writeFile(wb, "распознанные_данные.xlsx");
+                XLSX.writeFile(wb, "распознанная_таблица.xlsx");
                 
                 showStatus('Файл успешно сохранен!', 'success');
             });
