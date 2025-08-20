@@ -47,4 +47,585 @@
         }
         
         h1 {
-            color: var(--
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+        }
+        
+        .description {
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+        
+        .upload-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-bottom: 30px;
+            background: var(--light-color);
+            padding: 20px;
+            border-radius: 10px;
+        }
+        
+        .section-title {
+            color: var(--secondary-color);
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .upload-zone {
+            border: 2px dashed var(--accent-color);
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: rgba(76, 181, 245, 0.05);
+        }
+        
+        .upload-zone:hover {
+            background-color: rgba(76, 181, 245, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .upload-zone p {
+            margin-top: 10px;
+            color: #666;
+        }
+        
+        .upload-icon {
+            font-size: 48px;
+            color: var(--accent-color);
+        }
+        
+        .template-section {
+            margin-bottom: 30px;
+            background: var(--light-color);
+            padding: 20px;
+            border-radius: 10px;
+        }
+        
+        .template-upload {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        input[type="file"] {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            flex-grow: 1;
+            min-width: 200px;
+        }
+        
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        
+        button:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .process-btn {
+            background-color: var(--success-color);
+            font-size: 18px;
+            padding: 15px 30px;
+            display: block;
+            margin: 30px auto;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+        
+        .process-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+        }
+        
+        .result-section {
+            margin-top: 30px;
+            background: var(--light-color);
+            padding: 20px;
+            border-radius: 10px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+        
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        th {
+            background-color: var(--secondary-color);
+            color: white;
+            font-weight: 500;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        
+        tr:hover {
+            background-color: #e9ecef;
+        }
+        
+        .download-btn {
+            background-color: var(--success-color);
+            padding: 12px 25px;
+            font-size: 16px;
+            border-radius: 50px;
+            display: block;
+            margin: 20px auto;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .status-message {
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 500;
+        }
+        
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .loading {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .progress {
+            height: 100%;
+            background-color: var(--success-color);
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        .template-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .template-item img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+        
+        .template-item button {
+            background-color: var(--danger-color);
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .upload-zone {
+                padding: 20px;
+            }
+            
+            .template-upload {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Фото в Excel Конвертер</h1>
+            <p class="description">Загрузите фотографию с текстом или таблицей, и мы преобразуем её в Excel-файл с помощью нейросети DeepSeek</p>
+        </header>
+        
+        <div class="upload-section">
+            <h2 class="section-title">Загрузите фотографию</h2>
+            <div class="upload-zone" id="imageUploadZone">
+                <div class="upload-icon">📷</div>
+                <p>Перетащите сюда изображение или кликните для выбора файла</p>
+                <input type="file" id="imageInput" accept="image/*" class="hidden">
+            </div>
+            <div id="imagePreview"></div>
+        </div>
+        
+        <div class="template-section">
+            <h2 class="section-title">Шаблон почерка (опционально)</h2>
+            <p>Для улучшения распознавания рукописного текста загрузите образцы вашего почерка</p>
+            <div class="template-upload">
+                <input type="file" id="templateInput" accept="image/*">
+                <button id="addTemplateBtn">Добавить шаблон</button>
+            </div>
+            <div id="templatesList"></div>
+        </div>
+        
+        <button id="processBtn" class="process-btn">Распознать и преобразовать</button>
+        
+        <div id="statusMessage" class="status-message hidden"></div>
+        <div id="loading" class="loading hidden">
+            <div class="spinner"></div>
+            <p>Обрабатываем изображение с помощью DeepSeek API</p>
+            <div class="progress-bar">
+                <div class="progress" id="progressBar"></div>
+            </div>
+        </div>
+        
+        <div class="result-section hidden" id="resultSection">
+            <h2 class="section-title">Результат распознавания</h2>
+            <div id="previewTable"></div>
+            <button id="downloadBtn" class="download-btn">Скачать Excel файл</button>
+        </div>
+        
+        <footer>
+            <p>© 2023 Фото в Excel Конвертер | Интеграция с DeepSeek API</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Элементы DOM
+            const imageUploadZone = document.getElementById('imageUploadZone');
+            const imageInput = document.getElementById('imageInput');
+            const imagePreview = document.getElementById('imagePreview');
+            const templateInput = document.getElementById('templateInput');
+            const addTemplateBtn = document.getElementById('addTemplateBtn');
+            const templatesList = document.getElementById('templatesList');
+            const processBtn = document.getElementById('processBtn');
+            const statusMessage = document.getElementById('statusMessage');
+            const loading = document.getElementById('loading');
+            const progressBar = document.getElementById('progressBar');
+            const resultSection = document.getElementById('resultSection');
+            const previewTable = document.getElementById('previewTable');
+            const downloadBtn = document.getElementById('downloadBtn');
+            
+            // API ключ DeepSeek (можно изменить здесь)
+            const API_KEY = "sk-8f747d70cfce4f8587910b14e547e326";
+            
+            // Переменные состояния
+            let uploadedImage = null;
+            let handwritingTemplates = [];
+            let recognizedData = [];
+            
+            // Обработчики для загрузки изображения
+            imageUploadZone.addEventListener('click', () => {
+                imageInput.click();
+            });
+            
+            imageUploadZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                imageUploadZone.style.backgroundColor = 'rgba(76, 181, 245, 0.2)';
+            });
+            
+            imageUploadZone.addEventListener('dragleave', () => {
+                imageUploadZone.style.backgroundColor = '';
+            });
+            
+            imageUploadZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                imageUploadZone.style.backgroundColor = '';
+                
+                if (e.dataTransfer.files.length) {
+                    handleImageUpload(e.dataTransfer.files[0]);
+                }
+            });
+            
+            imageInput.addEventListener('change', (e) => {
+                if (e.target.files.length) {
+                    handleImageUpload(e.target.files[0]);
+                }
+            });
+            
+            function handleImageUpload(file) {
+                if (!file.type.match('image.*')) {
+                    showStatus('Пожалуйста, загрузите файл изображения', 'error');
+                    return;
+                }
+                
+                uploadedImage = file;
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagePreview.innerHTML = `
+                        <div style="margin-top: 20px; text-align: center;">
+                            <img src="${e.target.result}" style="max-width: 100%; max-height: 300px; border-radius: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+                            <p style="margin-top: 10px;">${file.name}</p>
+                        </div>
+                    `;
+                };
+                reader.readAsDataURL(file);
+            }
+            
+            // Обработчики для шаблонов почерка
+            addTemplateBtn.addEventListener('click', () => {
+                if (!templateInput.files.length) {
+                    showStatus('Сначала выберите файл шаблона', 'error');
+                    return;
+                }
+                
+                const file = templateInput.files[0];
+                if (!file.type.match('image.*')) {
+                    showStatus('Пожалуйста, загрузите файл изображения', 'error');
+                    return;
+                }
+                
+                handwritingTemplates.push(file);
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const templateId = 'template-' + Date.now();
+                    templatesList.innerHTML += `
+                        <div class="template-item" id="${templateId}">
+                            <img src="${e.target.result}" alt="Шаблон почерка">
+                            <div>
+                                <p>${file.name}</p>
+                                <button onclick="removeTemplate('${templateId}')">Удалить</button>
+                            </div>
+                        </div>
+                    `;
+                };
+                reader.readAsDataURL(file);
+                
+                templateInput.value = '';
+            });
+            
+            // Функция для удаления шаблона (доступна глобально для onclick)
+            window.removeTemplate = function(templateId) {
+                const templateElement = document.getElementById(templateId);
+                const templateIndex = Array.from(templateElement.parentNode.children).indexOf(templateElement);
+                
+                handwritingTemplates.splice(templateIndex, 1);
+                templateElement.remove();
+            };
+            
+            // Обработка изображения
+            processBtn.addEventListener('click', async () => {
+                if (!uploadedImage) {
+                    showStatus('Пожалуйста, сначала загрузите изображение', 'error');
+                    return;
+                }
+                
+                loading.classList.remove('hidden');
+                statusMessage.classList.add('hidden');
+                
+                try {
+                    // Имитируем прогресс
+                    simulateProgress();
+                    
+                    // В реальном приложении здесь будет вызов API DeepSeek
+                    const result = await callDeepSeekAPI(uploadedImage, handwritingTemplates);
+                    
+                    if (result.success) {
+                        recognizedData = result.data;
+                        displayRecognitionResult(recognizedData);
+                        resultSection.classList.remove('hidden');
+                        showStatus('Текст успешно распознан!', 'success');
+                    } else {
+                        throw new Error(result.error || 'Неизвестная ошибка при распознавании');
+                    }
+                } catch (error) {
+                    showStatus('Ошибка при обработке изображения: ' + error.message, 'error');
+                } finally {
+                    loading.classList.add('hidden');
+                }
+            });
+            
+            // Имитация вызова API DeepSeek
+            async function callDeepSeekAPI(image, templates) {
+                // В реальном приложении здесь будет реальный вызов API
+                // Для демонстрации используем имитацию
+                
+                // Создаем FormData для отправки
+                const formData = new FormData();
+                formData.append('image', image);
+                
+                templates.forEach((template, index) => {
+                    formData.append(`template_${index}`, template);
+                });
+                
+                // Имитация запроса к API
+                await new Promise(resolve => setTimeout(resolve, 3000));
+                
+                // Имитация ответа от API
+                return {
+                    success: true,
+                    data: [
+                        ['Наименование', 'Количество', 'Цена', 'Сумма'],
+                        ['Бумага офисная', '5', '250.00', '1250.00'],
+                        ['Ручки шариковые', '10', '30.00', '300.00'],
+                        ['Карандаши', '7', '15.00', '105.00'],
+                        ['Скрепки', '2', '45.00', '90.00']
+                    ]
+                };
+            }
+            
+            function simulateProgress() {
+                let width = 0;
+                const interval = setInterval(() => {
+                    if (width >= 100) {
+                        clearInterval(interval);
+                    } else {
+                        width += 5;
+                        progressBar.style.width = width + '%';
+                    }
+                }, 150);
+            }
+            
+            function displayRecognitionResult(data) {
+                let tableHTML = '<table>';
+                
+                // Создаем заголовок таблицы
+                tableHTML += '<tr>';
+                for (let i = 0; i < data[0].length; i++) {
+                    tableHTML += `<th>${data[0][i]}</th>`;
+                }
+                tableHTML += '</tr>';
+                
+                // Создаем строки таблицы
+                for (let i = 1; i < data.length; i++) {
+                    tableHTML += '<tr>';
+                    for (let j = 0; j < data[i].length; j++) {
+                        tableHTML += `<td contenteditable="true">${data[i][j]}</td>`;
+                    }
+                    tableHTML += '</tr>';
+                }
+                
+                tableHTML += '</table>';
+                previewTable.innerHTML = tableHTML;
+            }
+            
+            // Скачивание Excel файла
+            downloadBtn.addEventListener('click', () => {
+                // Собираем данные из таблицы
+                const tableData = [];
+                const rows = previewTable.querySelectorAll('tr');
+                
+                rows.forEach(row => {
+                    const rowData = [];
+                    row.querySelectorAll('td, th').forEach(cell => {
+                        rowData.push(cell.textContent);
+                    });
+                    tableData.push(rowData);
+                });
+                
+                // Создаем книгу Excel
+                const ws = XLSX.utils.aoa_to_sheet(tableData);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "Распознанные данные");
+                
+                // Сохраняем файл
+                XLSX.writeFile(wb, "распознанные_данные.xlsx");
+                
+                showStatus('Файл успешно сохранен!', 'success');
+            });
+            
+            function showStatus(message, type) {
+                statusMessage.textContent = message;
+                statusMessage.className = 'status-message';
+                statusMessage.classList.add(type);
+                statusMessage.classList.remove('hidden');
+                
+                // Автоматически скрыть сообщение через 5 секунд
+                setTimeout(() => {
+                    statusMessage.classList.add('hidden');
+                }, 5000);
+            }
+        });
+    </script>
+</body>
+</html>
