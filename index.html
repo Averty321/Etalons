@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Эволюция: Путь от Обезьяны к Человеку</title>
+    <title>Генератор Лабиринтов</title>
     <style>
         * {
             margin: 0;
@@ -14,37 +14,35 @@
         
         body {
             font-family: 'Arial', sans-serif;
-            background: linear-gradient(to bottom, #1a2a6c, #b21f1f, #fdbb2d);
+            background: linear-gradient(to bottom, #2c3e50, #4ca1af);
             color: white;
-            overflow: hidden;
             height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
             user-select: none;
         }
         
         #game-container {
             position: relative;
-            width: 100%;
-            height: 100vh;
-            overflow: hidden;
+            width: 95vmin;
+            height: 95vmin;
+            max-width: 600px;
+            max-height: 600px;
+            margin: 10px;
         }
         
-        #game-canvas {
+        #maze-canvas {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: 1;
-        }
-        
-        #ui-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 2;
-            pointer-events: none;
+            background-color: #1a1a2e;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
         }
         
         .screen {
@@ -57,9 +55,11 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 3;
-            transition: opacity 0.5s;
+            background: rgba(26, 26, 46, 0.9);
+            border-radius: 8px;
+            z-index: 10;
+            text-align: center;
+            padding: 20px;
         }
         
         .hidden {
@@ -67,10 +67,16 @@
         }
         
         h1 {
-            font-size: 2.5rem;
-            text-align: center;
-            margin-bottom: 20px;
+            font-size: 2.2rem;
+            margin-bottom: 15px;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            color: #ffcc00;
+        }
+        
+        p {
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+            line-height: 1.4;
         }
         
         button {
@@ -82,7 +88,6 @@
             font-size: 1.2rem;
             margin: 10px;
             cursor: pointer;
-            pointer-events: auto;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
             transition: transform 0.1s, box-shadow 0.1s;
         }
@@ -97,10 +102,10 @@
             top: 10px;
             left: 10px;
             background: rgba(0, 0, 0, 0.5);
-            padding: 10px;
+            padding: 10px 15px;
             border-radius: 10px;
-            pointer-events: none;
-            z-index: 4;
+            z-index: 5;
+            font-size: 1rem;
         }
         
         #controls {
@@ -108,10 +113,9 @@
             bottom: 20px;
             width: 100%;
             display: flex;
-            justify-content: space-around;
-            padding: 0 20px;
-            pointer-events: none;
-            z-index: 4;
+            justify-content: center;
+            gap: 20px;
+            z-index: 5;
         }
         
         .control-btn {
@@ -123,704 +127,361 @@
             justify-content: center;
             align-items: center;
             font-size: 24px;
-            pointer-events: auto;
+            color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
         }
         
-        #joystick-area {
+        #level-up {
             position: absolute;
-            bottom: 30px;
-            left: 30px;
-            width: 120px;
-            height: 120px;
-            pointer-events: auto;
-            z-index: 4;
-        }
-        
-        #joystick {
-            position: absolute;
-            width: 60px;
-            height: 60px;
-            background: rgba(255, 255, 255, 0.5);
-            border-radius: 50%;
+            top: 50%;
+            left: 50%;
             transform: translate(-50%, -50%);
-            touch-action: none;
-        }
-        
-        #evolution-bar-container {
-            position: absolute;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80%;
-            height: 20px;
-            background: rgba(0, 0, 0, 0.5);
-            border-radius: 10px;
-            z-index: 4;
-            pointer-events: none;
-        }
-        
-        #evolution-bar {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(to right, #4caf50, #8bc34a);
-            border-radius: 10px;
-            transition: width 0.5s;
-        }
-        
-        #stage-indicator {
-            position: absolute;
-            top: 35px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 1rem;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-            z-index: 4;
-            pointer-events: none;
-        }
-        
-        .creature {
-            position: absolute;
-            transition: transform 0.2s;
-        }
-        
-        .food {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            background: #8bc34a;
-            border-radius: 50%;
-        }
-        
-        .evolution-notification {
-            position: absolute;
-            top: 30%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.7);
-            padding: 15px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
             border-radius: 10px;
             text-align: center;
-            animation: fadeOut 3s forwards;
-            z-index: 5;
+            z-index: 15;
+            animation: fadeInOut 3s forwards;
         }
         
-        @keyframes fadeOut {
-            0% { opacity: 1; }
-            70% { opacity: 1; }
+        @keyframes fadeInOut {
+            0% { opacity: 0; }
+            20% { opacity: 1; }
+            80% { opacity: 1; }
             100% { opacity: 0; display: none; }
+        }
+        
+        #instructions {
+            position: absolute;
+            bottom: 100px;
+            text-align: center;
+            width: 100%;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .difficulty-buttons {
+            display: flex;
+            flex-direction: column;
+            width: 80%;
+            max-width: 300px;
+        }
+        
+        .difficulty-buttons button {
+            margin: 8px 0;
         }
     </style>
 </head>
 <body>
     <div id="game-container">
-        <canvas id="game-canvas"></canvas>
+        <canvas id="maze-canvas"></canvas>
         
-        <div id="ui-overlay">
-            <div id="stats">
-                <div>Энергия: <span id="energy-value">100</span></div>
-                <div>Собрано еды: <span id="food-count">0</span></div>
-            </div>
-            
-            <div id="evolution-bar-container">
-                <div id="evolution-bar"></div>
-            </div>
-            <div id="stage-indicator">Обезьяна</div>
-            
-            <div id="controls">
-                <div class="control-btn" id="action-btn">⚡</div>
-                <div class="control-btn" id="special-btn">🌟</div>
-            </div>
-            
-            <div id="joystick-area">
-                <div id="joystick"></div>
-            </div>
+        <div id="stats">
+            Уровень: <span id="level">1</span> | 
+            Время: <span id="time">0</span>с
+        </div>
+        
+        <div id="controls">
+            <div class="control-btn" id="up">↑</div>
+            <div class="control-btn" id="left">←</div>
+            <div class="control-btn" id="right">→</div>
+            <div class="control-btn" id="down">↓</div>
         </div>
         
         <div id="start-screen" class="screen">
-            <h1>Эволюция: Путь от Обезьяны к Человеку</h1>
-            <p>Собирайте еду, избегайте хищников и развивайтесь!</p>
-            <button id="start-button">Начать игру</button>
+            <h1>Генератор Лабиринтов</h1>
+            <p>Найдите выход из случайно сгенерированного лабиринта! Управляйте с помощью кнопок или свайпов.</p>
+            <div class="difficulty-buttons">
+                <button id="easy-btn">Лёгкий уровень</button>
+                <button id="medium-btn">Средний уровень</button>
+                <button id="hard-btn">Сложный уровень</button>
+            </div>
         </div>
         
-        <div id="evolution-screen" class="screen hidden">
-            <h1>Новая стадия эволюции!</h1>
-            <div id="evolution-stage"></div>
-            <button id="continue-button">Продолжить</button>
+        <div id="level-complete-screen" class="screen hidden">
+            <h1>Уровень пройден!</h1>
+            <p>Вы нашли выход за <span id="complete-time">0</span> секунд</p>
+            <button id="next-level-btn">Следующий уровень</button>
+            <button id="menu-btn">В меню</button>
         </div>
         
-        <div id="game-over-screen" class="screen hidden">
-            <h1>Игра окончена</h1>
-            <p>Вы достигли: <span id="final-stage">Обезьяна</span></p>
-            <button id="restart-button">Играть снова</button>
+        <div id="instructions">
+            Свайпайте для движения или используйте кнопки
         </div>
     </div>
 
     <script>
-        // Основные переменные игры
-        let canvas, ctx;
-        let gameActive = false;
-        let player = {
-            x: 0,
-            y: 0,
-            speed: 3,
-            size: 30,
-            energy: 100,
-            foodCollected: 0,
-            evolutionProgress: 0,
-            stage: 0,
-            stageNames: ['Обезьяна', 'Гоминид', 'Человек умелый', 'Человек прямоходящий', 'Человек разумный'],
-            color: '#8b4513'
+        // Конфигурация игры
+        const config = {
+            easy: { cellSize: 40, mazeSize: 11 },
+            medium: { cellSize: 30, mazeSize: 15 },
+            hard: { cellSize: 20, mazeSize: 21 }
         };
         
-        let creatures = [];
-        let foods = [];
-        let joystick = { x: 0, y: 0, active: false };
-        let touchId = null;
+        // Состояние игры
+        let canvas, ctx;
+        let maze = [];
+        let player = { x: 1, y: 1 };
+        let exit = { x: 0, y: 0 };
+        let currentLevel = 1;
+        let gameTime = 0;
+        let timerInterval;
+        let currentDifficulty = 'medium';
+        let cellSize, mazeSize;
+        let touchStartX, touchStartY;
         
         // Инициализация игры
         function init() {
-            canvas = document.getElementById('game-canvas');
+            canvas = document.getElementById('maze-canvas');
             ctx = canvas.getContext('2d');
+            
+            // Установка сложности
+            document.getElementById('easy-btn').addEventListener('click', () => setDifficulty('easy'));
+            document.getElementById('medium-btn').addEventListener('click', () => setDifficulty('medium'));
+            document.getElementById('hard-btn').addEventListener('click', () => setDifficulty('hard'));
+            
+            // Кнопки управления
+            document.getElementById('up').addEventListener('touchstart', () => movePlayer(0, -1));
+            document.getElementById('down').addEventListener('touchstart', () => movePlayer(0, 1));
+            document.getElementById('left').addEventListener('touchstart', () => movePlayer(-1, 0));
+            document.getElementById('right').addEventListener('touchstart', () => movePlayer(1, 0));
+            
+            // Кнопки меню
+            document.getElementById('next-level-btn').addEventListener('click', nextLevel);
+            document.getElementById('menu-btn').addEventListener('click', showMenu);
+            
+            // Обработка свайпов
+            canvas.addEventListener('touchstart', handleTouchStart, false);
+            canvas.addEventListener('touchmove', handleTouchMove, false);
+            
+            // Установка размера canvas
             resizeCanvas();
-            
-            // Слушатели событий
             window.addEventListener('resize', resizeCanvas);
-            document.getElementById('start-button').addEventListener('click', startGame);
-            document.getElementById('restart-button').addEventListener('click', startGame);
-            document.getElementById('continue-button').addEventListener('click', continueGame);
-            
-            // Настройка джойстика
-            const joystickArea = document.getElementById('joystick-area');
-            const joystickElement = document.getElementById('joystick');
-            
-            joystickArea.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                if (!gameActive) return;
-                
-                const touch = e.touches[0];
-                touchId = touch.identifier;
-                joystick.active = true;
-                updateJoystickPosition(touch.clientX, touch.clientY);
-            });
-            
-            joystickArea.addEventListener('touchmove', (e) => {
-                e.preventDefault();
-                if (!gameActive || !joystick.active) return;
-                
-                for (let i = 0; i < e.changedTouches.length; i++) {
-                    if (e.changedTouches[i].identifier === touchId) {
-                        updateJoystickPosition(e.changedTouches[i].clientX, e.changedTouches[i].clientY);
-                        break;
-                    }
-                }
-            });
-            
-            joystickArea.addEventListener('touchend', (e) => {
-                e.preventDefault();
-                if (!gameActive) return;
-                
-                for (let i = 0; i < e.changedTouches.length; i++) {
-                    if (e.changedTouches[i].identifier === touchId) {
-                        resetJoystick();
-                        break;
-                    }
-                }
-            });
-            
-            // Кнопки действий
-            document.getElementById('action-btn').addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                if (!gameActive) return;
-                // Действие при нажатии (например, атака или ускорение)
-                if (player.energy > 10) {
-                    player.speed = 6;
-                    player.energy -= 1;
-                    setTimeout(() => { player.speed = 3; }, 1000);
-                }
-            });
-            
-            document.getElementById('special-btn').addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                if (!gameActive) return;
-                // Специальное действие в зависимости от стадии
-                if (player.stage >= 2 && player.energy > 30) {
-                    player.energy -= 30;
-                    // Использовать инструменты или особую способность
-                    showNotification("Использована специальная способность!");
-                }
-            });
-            
-            // Генерация начального содержимого
-            generateInitialFood();
-            generateInitialCreatures();
-            
-            // Запуск цикла отрисовки
-            requestAnimationFrame(gameLoop);
+        }
+        
+        function setDifficulty(difficulty) {
+            currentDifficulty = difficulty;
+            cellSize = config[difficulty].cellSize;
+            mazeSize = config[difficulty].mazeSize;
+            startGame();
         }
         
         function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
+            // Подстраиваем размер canvas под контейнер
+            const container = document.getElementById('game-container');
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
             
-            // Перемещаем игрока в центр при изменении размера
-            player.x = canvas.width / 2;
-            player.y = canvas.height / 2;
+            // Если игра активна, перерисовываем лабиринт
+            if (maze.length > 0) {
+                drawMaze();
+            }
         }
         
         function startGame() {
-            // Сброс состояния игры
-            player = {
-                x: canvas.width / 2,
-                y: canvas.height / 2,
-                speed: 3,
-                size: 30,
-                energy: 100,
-                foodCollected: 0,
-                evolutionProgress: 0,
-                stage: 0,
-                stageNames: ['Обезьяна', 'Гоминид', 'Человек умелый', 'Человек прямоходящий', 'Человек разумный'],
-                color: '#8b4513'
-            };
-            
-            creatures = [];
-            foods = [];
-            
-            generateInitialFood();
-            generateInitialCreatures();
-            
-            // Обновление интерфейса
             document.getElementById('start-screen').classList.add('hidden');
-            document.getElementById('game-over-screen').classList.add('hidden');
-            document.getElementById('evolution-screen').classList.add('hidden');
+            document.getElementById('level-complete-screen').classList.add('hidden');
             
-            updateStats();
-            updateEvolutionBar();
+            generateMaze();
+            drawMaze();
             
-            gameActive = true;
+            // Сброс и запуск таймера
+            gameTime = 0;
+            document.getElementById('time').textContent = gameTime;
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                gameTime++;
+                document.getElementById('time').textContent = gameTime;
+            }, 1000);
+            
+            // Обновление статистики
+            document.getElementById('level').textContent = currentLevel;
         }
         
-        function continueGame() {
-            document.getElementById('evolution-screen').classList.add('hidden');
-            gameActive = true;
-        }
-        
-        function gameOver() {
-            gameActive = false;
-            document.getElementById('final-stage').textContent = player.stageNames[player.stage];
-            document.getElementById('game-over-screen').classList.remove('hidden');
-        }
-        
-        function gameLoop() {
-            if (gameActive) {
-                update();
-                render();
-            }
-            requestAnimationFrame(gameLoop);
-        }
-        
-        function update() {
-            // Перемещение игрока
-            if (joystick.active) {
-                player.x += joystick.x * player.speed;
-                player.y += joystick.y * player.speed;
-                
-                // Ограничение в пределах canvas
-                player.x = Math.max(player.size, Math.min(canvas.width - player.size, player.x));
-                player.y = Math.max(player.size, Math.min(canvas.height - player.size, player.y));
-            }
-            
-            // Постепенное уменьшение энергии
-            player.energy -= 0.05;
-            
-            // Проверка съеденной еды
-            checkFoodCollision();
-            
-            // Проверка столкновений с существами
-            checkCreatureCollisions();
-            
-            // Обновление существ
-            updateCreatures();
-            
-            // Добавление новой еды, если нужно
-            if (foods.length < 20) {
-                generateFood();
-            }
-            
-            // Проверка условий эволюции
-            checkEvolution();
-            
-            // Проверка завершения игры
-            if (player.energy <= 0) {
-                gameOver();
-            }
-            
-            // Обновление интерфейса
-            updateStats();
-        }
-        
-        function render() {
-            // Очистка canvas
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            // Отрисовка фона
-            drawBackground();
-            
-            // Отрисовка еды
-            drawFood();
-            
-            // Отрисовка существ
-            drawCreatures();
-            
-            // Отрисовка игрока
-            drawPlayer();
-        }
-        
-        function drawBackground() {
-            // Простой градиентный фон
-            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-            gradient.addColorStop(0, "#1a2a6c");
-            gradient.addColorStop(0.5, "#b21f1f");
-            gradient.addColorStop(1, "#fdbb2d");
-            
-            ctx.fillStyle = gradient;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
-            // Рисуем землю
-            ctx.fillStyle = '#8B4513';
-            ctx.fillRect(0, canvas.height * 0.7, canvas.width, canvas.height * 0.3);
-            
-            // Рисуем несколько простых деревьев
-            ctx.fillStyle = '#5d4037';
-            for (let i = 0; i < 5; i++) {
-                const x = (i * canvas.width / 5) + (Math.random() * 50);
-                ctx.fillRect(x, canvas.height * 0.6, 15, canvas.height * 0.2);
-                
-                ctx.fillStyle = '#2e7d32';
-                ctx.beginPath();
-                ctx.arc(x + 7, canvas.height * 0.55, 30, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.fillStyle = '#5d4037';
-            }
-        }
-        
-        function drawPlayer() {
-            ctx.fillStyle = player.color;
-            ctx.beginPath();
-            ctx.arc(player.x, player.y, player.size, 0, Math.PI * 2);
-            ctx.fill();
-            
-            // Глаза
-            ctx.fillStyle = 'white';
-            ctx.beginPath();
-            ctx.arc(player.x - 10, player.y - 5, 5, 0, Math.PI * 2);
-            ctx.arc(player.x + 10, player.y - 5, 5, 0, Math.PI * 2);
-            ctx.fill();
-            
-            ctx.fillStyle = 'black';
-            ctx.beginPath();
-            ctx.arc(player.x - 10, player.y - 5, 2, 0, Math.PI * 2);
-            ctx.arc(player.x + 10, player.y - 5, 2, 0, Math.PI * 2);
-            ctx.fill();
-            
-            // Рот (меняется в зависимости от стадии)
-            ctx.beginPath();
-            if (player.stage < 2) {
-                // Обезьяна/гоминид
-                ctx.arc(player.x, player.y + 5, 7, 0, Math.PI);
-            } else {
-                // Более развитые стадии
-                ctx.arc(player.x, player.y + 8, 5, 0, Math.PI, true);
-            }
-            ctx.stroke();
-            
-            // Особенности в зависимости от стадии эволюции
-            if (player.stage >= 2) {
-                // Инструменты для более развитых стадий
-                ctx.fillStyle = '#795548';
-                ctx.fillRect(player.x + player.size - 5, player.y - 15, 15, 5);
-            }
-            
-            if (player.stage >= 3) {
-                // Более прямая осанка
-                ctx.fillStyle = player.color;
-                ctx.fillRect(player.x - 10, player.y - player.size - 5, 20, 10);
-            }
-        }
-        
-        function drawFood() {
-            for (const food of foods) {
-                ctx.fillStyle = food.color;
-                ctx.beginPath();
-                ctx.arc(food.x, food.y, food.size, 0, Math.PI * 2);
-                ctx.fill();
-            }
-        }
-        
-        function drawCreatures() {
-            for (const creature of creatures) {
-                ctx.fillStyle = creature.color;
-                ctx.beginPath();
-                ctx.arc(creature.x, creature.y, creature.size, 0, Math.PI * 2);
-                ctx.fill();
-                
-                // Глаза для хищников
-                if (creature.type === 'predator') {
-                    ctx.fillStyle = 'white';
-                    ctx.beginPath();
-                    ctx.arc(creature.x - 5, creature.y - 3, 3, 0, Math.PI * 2);
-                    ctx.arc(creature.x + 5, creature.y - 3, 3, 0, Math.PI * 2);
-                    ctx.fill();
-                    
-                    ctx.fillStyle = 'red';
-                    ctx.beginPath();
-                    ctx.arc(creature.x - 5, creature.y - 3, 1.5, 0, Math.PI * 2);
-                    ctx.arc(creature.x + 5, creature.y - 3, 1.5, 0, Math.PI * 2);
-                    ctx.fill();
+        function generateMaze() {
+            // Инициализация матрицы лабиринта
+            maze = [];
+            for (let y = 0; y < mazeSize; y++) {
+                maze[y] = [];
+                for (let x = 0; x < mazeSize; x++) {
+                    maze[y][x] = 1; // 1 = стена, 0 = проход
                 }
             }
+            
+            // Начальная позиция игрока
+            player = { x: 1, y: 1 };
+            maze[player.y][player.x] = 0;
+            
+            // Рекурсивное создание лабиринта
+            carvePath(1, 1);
+            
+            // Убедимся, что есть выход
+            createExit();
         }
         
-        function updateJoystickPosition(x, y) {
-            const joystickArea = document.getElementById('joystick-area');
-            const joystickElement = document.getElementById('joystick');
-            
-            const areaRect = joystickArea.getBoundingClientRect();
-            const areaCenterX = areaRect.left + areaRect.width / 2;
-            const areaCenterY = areaRect.top + areaRect.height / 2;
-            
-            let dx = x - areaCenterX;
-            let dy = y - areaCenterY;
-            
-            // Ограничение радиуса джойстика
-            const distance = Math.min(Math.sqrt(dx * dx + dy * dy), areaRect.width / 2);
-            const angle = Math.atan2(dy, dx);
-            
-            dx = Math.cos(angle) * distance;
-            dy = Math.sin(angle) * distance;
-            
-            // Обновление позиции джойстика на экране
-            joystickElement.style.left = `${areaRect.width / 2 + dx}px`;
-            joystickElement.style.top = `${areaRect.height / 2 + dy}px`;
-            
-            // Нормализованные значения для движения
-            joystick.x = dx / (areaRect.width / 2);
-            joystick.y = dy / (areaRect.height / 2);
-        }
-        
-        function resetJoystick() {
-            const joystickElement = document.getElementById('joystick');
-            joystickElement.style.left = '50%';
-            joystickElement.style.top = '50%';
-            
-            joystick.x = 0;
-            joystick.y = 0;
-            joystick.active = false;
-            touchId = null;
-        }
-        
-        function generateInitialFood() {
-            for (let i = 0; i < 15; i++) {
-                generateFood();
-            }
-        }
-        
-        function generateFood() {
-            const size = 5 + Math.random() * 5;
-            const x = Math.random() * canvas.width;
-            const y = canvas.height * 0.7 + Math.random() * (canvas.height * 0.3 - size);
-            
-            // Разные типы еды с разной питательной ценностью
-            const types = [
-                { color: '#8bc34a', energy: 10 },
-                { color: '#ffeb3b', energy: 15 },
-                { color: '#ff9800', energy: 20 }
+        function carvePath(x, y) {
+            // Направления: вверх, вправо, вниз, влево
+            const directions = [
+                [0, -2], [2, 0], [0, 2], [-2, 0]
             ];
             
-            const type = types[Math.floor(Math.random() * types.length)];
+            // Случайным образом перемешиваем направления
+            shuffleArray(directions);
             
-            foods.push({
-                x, y, size,
-                color: type.color,
-                energy: type.energy
-            });
+            for (const [dx, dy] of directions) {
+                const nx = x + dx;
+                const ny = y + dy;
+                
+                // Если новая позиция внутри лабиринта и является стеной
+                if (nx > 0 && nx < mazeSize - 1 && ny > 0 && ny < mazeSize - 1 && maze[ny][nx] === 1) {
+                    // Убираем стену между текущей и новой ячейкой
+                    maze[y + dy/2][x + dx/2] = 0;
+                    maze[ny][nx] = 0;
+                    
+                    // Продолжаем рекурсивно
+                    carvePath(nx, ny);
+                }
+            }
         }
         
-        function generateInitialCreatures() {
-            // Создаем несколько существ разных типов
-            for (let i = 0; i < 5; i++) {
-                generateCreature('prey');
+        function createExit() {
+            // Создаем выход в одной из границ лабиринта
+            const side = Math.floor(Math.random() * 4); // 0: верх, 1: право, 2: низ, 3: лево
+            
+            switch (side) {
+                case 0: // Верх
+                    exit = { x: Math.floor(Math.random() * (mazeSize - 2)) + 1, y: 0 };
+                    break;
+                case 1: // Право
+                    exit = { x: mazeSize - 1, y: Math.floor(Math.random() * (mazeSize - 2)) + 1 };
+                    break;
+                case 2: // Низ
+                    exit = { x: Math.floor(Math.random() * (mazeSize - 2)) + 1, y: mazeSize - 1 };
+                    break;
+                case 3: // Лево
+                    exit = { x: 0, y: Math.floor(Math.random() * (mazeSize - 2)) + 1 };
+                    break;
             }
             
-            for (let i = 0; i < 2; i++) {
-                generateCreature('predator');
-            }
+            // Убедимся, что выход соединен с лабиринтом
+            if (exit.x === 0) maze[exit.y][exit.x + 1] = 0;
+            else if (exit.x === mazeSize - 1) maze[exit.y][exit.x - 1] = 0;
+            else if (exit.y === 0) maze[exit.y + 1][exit.x] = 0;
+            else if (exit.y === mazeSize - 1) maze[exit.y - 1][exit.x] = 0;
         }
         
-        function generateCreature(type) {
-            const size = type === 'predator' ? 25 : 15;
-            const x = Math.random() * canvas.width;
-            const y = canvas.height * 0.7 + Math.random() * (canvas.height * 0.3 - size);
+        function drawMaze() {
+            const width = canvas.width;
+            const height = canvas.height;
+            const cellWidth = width / mazeSize;
+            const cellHeight = height / mazeSize;
             
-            creatures.push({
-                x, y, size, type,
-                color: type === 'predator' ? '#f44336' : '#2196f3',
-                speed: type === 'predator' ? 1.5 : 1,
-                direction: Math.random() * Math.PI * 2,
-                directionChangeTime: 0
-            });
-        }
-        
-        function updateCreatures() {
-            for (const creature of creatures) {
-                // Периодически меняем направление движения
-                creature.directionChangeTime--;
-                if (creature.directionChangeTime <= 0) {
-                    creature.direction = Math.random() * Math.PI * 2;
-                    creature.directionChangeTime = 50 + Math.random() * 100;
-                }
-                
-                // Хищники преследуют игрока
-                if (creature.type === 'predator') {
-                    const dx = player.x - creature.x;
-                    const dy = player.y - creature.y;
-                    const distance = Math.sqrt(dx * dx + dy * dy);
-                    
-                    if (distance < 200) {
-                        creature.direction = Math.atan2(dy, dx);
-                    }
-                }
-                
-                // Движение существ
-                creature.x += Math.cos(creature.direction) * creature.speed;
-                creature.y += Math.sin(creature.direction) * creature.speed;
-                
-                // Ограничение в пределах игровой области
-                if (creature.x < creature.size) creature.x = creature.size;
-                if (creature.x > canvas.width - creature.size) creature.x = canvas.width - creature.size;
-                if (creature.y < creature.size) creature.y = creature.size;
-                if (creature.y > canvas.height - creature.size) creature.y = canvas.height - creature.size;
-                
-                // Отскакивание от границ
-                if (creature.x <= creature.size || creature.x >= canvas.width - creature.size) {
-                    creature.direction = Math.PI - creature.direction;
-                }
-                if (creature.y <= creature.size || creature.y >= canvas.height - creature.size) {
-                    creature.direction = -creature.direction;
-                }
-            }
-        }
-        
-        function checkFoodCollision() {
-            for (let i = foods.length - 1; i >= 0; i--) {
-                const food = foods[i];
-                const dx = player.x - food.x;
-                const dy = player.y - food.y;
-                const distance = Math.sqrt(dx * dx + dy * dy);
-                
-                if (distance < player.size + food.size) {
-                    // Игрок съедает еду
-                    player.energy = Math.min(100, player.energy + food.energy);
-                    player.foodCollected++;
-                    player.evolutionProgress += food.energy;
-                    
-                    foods.splice(i, 1);
-                    generateFood();
-                    
-                    updateStats();
-                    updateEvolutionBar();
-                }
-            }
-        }
-        
-        function checkCreatureCollisions() {
-            for (const creature of creatures) {
-                const dx = player.x - creature.x;
-                const dy = player.y - creature.y;
-                const distance = Math.sqrt(dx * dx + dy * dy);
-                
-                if (distance < player.size + creature.size) {
-                    if (creature.type === 'predator') {
-                        // Столкновение с хищником отнимает энергию
-                        player.energy -= 5;
-                        
-                        // Отталкивание от хищника
-                        const angle = Math.atan2(dy, dx);
-                        player.x += Math.cos(angle) * 20;
-                        player.y += Math.sin(angle) * 20;
-                    } else {
-                        // Столкновение с добычей дает немного энергии
-                        player.energy = Math.min(100, player.energy + 5);
-                        
-                        // Удаляем существо-добычу
-                        const index = creatures.indexOf(creature);
-                        if (index > -1) {
-                            creatures.splice(index, 1);
-                            generateCreature('prey');
-                        }
+            // Очистка canvas
+            ctx.fillStyle = '#1a1a2e';
+            ctx.fillRect(0, 0, width, height);
+            
+            // Рисуем стены
+            ctx.fillStyle = '#4cc9f0';
+            for (let y = 0; y < mazeSize; y++) {
+                for (let x = 0; x < mazeSize; x++) {
+                    if (maze[y][x] === 1) {
+                        ctx.fillRect(x * cellWidth, y * cellHeight, cellWidth, cellHeight);
                     }
                 }
             }
+            
+            // Рисуем выход
+            ctx.fillStyle = '#ffaa00';
+            ctx.fillRect(exit.x * cellWidth, exit.y * cellHeight, cellWidth, cellHeight);
+            
+            // Рисуем игрока
+            ctx.fillStyle = '#f72585';
+            ctx.beginPath();
+            ctx.arc(
+                (player.x + 0.5) * cellWidth,
+                (player.y + 0.5) * cellHeight,
+                Math.min(cellWidth, cellHeight) / 2.5,
+                0,
+                Math.PI * 2
+            );
+            ctx.fill();
         }
         
-        function checkEvolution() {
-            const evolutionThresholds = [100, 250, 500, 750, 1000];
+        function movePlayer(dx, dy) {
+            const newX = player.x + dx;
+            const newY = player.y + dy;
             
-            if (player.stage < evolutionThresholds.length && 
-                player.evolutionProgress >= evolutionThresholds[player.stage]) {
-                evolve();
+            // Проверяем, можно ли переместиться в новую позицию
+            if (newX >= 0 && newX < mazeSize && newY >= 0 && newY < mazeSize && maze[newY][newX] === 0) {
+                player.x = newX;
+                player.y = newY;
+                drawMaze();
+                
+                // Проверяем, дошел ли игрок до выхода
+                if (player.x === exit.x && player.y === exit.y) {
+                    levelComplete();
+                }
             }
         }
         
-        function evolve() {
-            gameActive = false;
-            player.stage++;
-            
-            // Изменяем характеристики игрока в зависимости от стадии
-            player.size = 30 + player.stage * 5;
-            player.speed = 3 + player.stage * 0.5;
-            
-            // Меняем цвет в зависимости от стадии
-            const colors = ['#8b4513', '#a0522d', '#cd853f', '#d2b48c', '#f5deb3'];
-            player.color = colors[Math.min(player.stage, colors.length - 1)];
-            
-            // Показываем экран эволюции
-            document.getElementById('evolution-stage').textContent = player.stageNames[player.stage];
-            document.getElementById('evolution-screen').classList.remove('hidden');
-            
-            // Обновляем индикатор стадии
-            document.getElementById('stage-indicator').textContent = player.stageNames[player.stage];
-            
-            showNotification(`Вы эволюционировали в ${player.stageNames[player.stage]}!`);
+        function handleTouchStart(event) {
+            // Запоминаем начальную позицию касания
+            touchStartX = event.touches[0].clientX;
+            touchStartY = event.touches[0].clientY;
+            event.preventDefault();
         }
         
-        function updateStats() {
-            document.getElementById('energy-value').textContent = Math.floor(player.energy);
-            document.getElementById('food-count').textContent = player.foodCollected;
+        function handleTouchMove(event) {
+            if (!touchStartX || !touchStartY) return;
+            
+            const touchEndX = event.touches[0].clientX;
+            const touchEndY = event.touches[0].clientY;
+            
+            const dx = touchEndX - touchStartX;
+            const dy = touchEndY - touchStartY;
+            
+            // Определяем направление свайпа
+            if (Math.abs(dx) > Math.abs(dy)) {
+                // Горизонтальный свайп
+                if (dx > 0) movePlayer(1, 0);  // Вправо
+                else movePlayer(-1, 0);         // Влево
+            } else {
+                // Вертикальный свайп
+                if (dy > 0) movePlayer(0, 1);   // Вниз
+                else movePlayer(0, -1);         // Вверх
+            }
+            
+            // Сбрасываем начальные координаты
+            touchStartX = null;
+            touchStartY = null;
+            
+            event.preventDefault();
         }
         
-        function updateEvolutionBar() {
-            const evolutionThresholds = [100, 250, 500, 750, 1000];
-            const currentThreshold = player.stage < evolutionThresholds.length ? 
-                evolutionThresholds[player.stage] : evolutionThresholds[evolutionThresholds.length - 1];
-            const prevThreshold = player.stage > 0 ? evolutionThresholds[player.stage - 1] : 0;
+        function levelComplete() {
+            clearInterval(timerInterval);
             
-            const progress = player.evolutionProgress - prevThreshold;
-            const maxProgress = currentThreshold - prevThreshold;
-            
-            const percentage = (progress / maxProgress) * 100;
-            document.getElementById('evolution-bar').style.width = `${percentage}%`;
+            document.getElementById('complete-time').textContent = gameTime;
+            document.getElementById('level-complete-screen').classList.remove('hidden');
         }
         
-        function showNotification(message) {
-            const notification = document.createElement('div');
-            notification.className = 'evolution-notification';
-            notification.textContent = message;
-            
-            document.getElementById('game-container').appendChild(notification);
-            
-            setTimeout(() => {
-                notification.remove();
-            }, 3000);
+        function nextLevel() {
+            currentLevel++;
+            startGame();
+        }
+        
+        function showMenu() {
+            clearInterval(timerInterval);
+            document.getElementById('level-complete-screen').classList.add('hidden');
+            document.getElementById('start-screen').classList.remove('hidden');
+        }
+        
+        // Вспомогательные функции
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
         }
         
         // Запуск игры при загрузке страницы
